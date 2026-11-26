@@ -75,8 +75,29 @@ STEPS = [
 ]
 
 
+def _is_ubuntu() -> bool:
+    """Bausteine nachträglich auf (K)ubuntu installiert statt MKO OS."""
+    try:
+        text = Path("/etc/os-release").read_text(errors="ignore")
+    except OSError:
+        return False
+    for line in text.splitlines():
+        key, _, val = line.partition("=")
+        if key in ("ID", "ID_LIKE") and "ubuntu" in val.strip('"').split():
+            return True
+    return False
+
+
+UBUNTU = _is_ubuntu()
+
+
 def apply_look() -> None:
-    """Dunkles Erscheinungsbild und MKO-Hintergrund – nur beim ersten Anmelden."""
+    """Dunkles Erscheinungsbild und MKO-Hintergrund – nur beim ersten Anmelden und nur auf MKO OS.
+
+    Auf Kubuntu bleibt das vorhandene Aussehen unangetastet; der Hintergrund steht dort unter
+    Hintergrundbild → „MKO-OS“ zur Auswahl."""
+    if UBUNTU:
+        return
     if _which("plasma-apply-lookandfeel"):
         subprocess.run(["plasma-apply-lookandfeel", "-a", "org.kde.breezedark.desktop"], capture_output=True)
     if _which("plasma-apply-wallpaperimage") and os.path.exists(WALLPAPER):
@@ -122,6 +143,11 @@ def main(argv=None) -> int:
                    "KDE-Schlüsselbund, nicht in Dateien.")
     intro.setWordWrap(True)
     lay.addWidget(intro)
+    if UBUNTU:
+        kub = QLabel("Die MKO-Bausteine laufen hier auf <b>Kubuntu</b>. Updates kommen wie gewohnt über Discover "
+                     "oder <code>sudo apt update &amp;&amp; sudo apt full-upgrade</code>.")
+        kub.setWordWrap(True)
+        lay.addWidget(kub)
     if LIVE:
         live = QLabel("<b>Live-System:</b> Alles läuft nur im Arbeitsspeicher – Einstellungen gehen beim Neustart "
                       "verloren. Zum dauerhaften Einrichten auf dem Schreibtisch <b>„MKO OS installieren“</b> starten.")

@@ -24,6 +24,7 @@ Persönliche Daten enthält das Paket nicht; alle Zugänge werden erst nach der 
 
 ## Änderungen
 
+- **0.1.4** – Läuft auch auf Kubuntu: dort bleibt das vorhandene Aussehen beim ersten Anmelden unverändert.
 - **0.1.3** – Paketquelle für Updates, wöchentliche npm-Aktualisierung.
 - **0.1.2** – Tastenkürzel-Übersicht bei jeder Anmeldung; Virenprüfung auf Abruf.
 - **0.1.1** – Vaultwarden im Willkommensfenster.

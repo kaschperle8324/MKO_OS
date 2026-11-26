@@ -35,6 +35,16 @@ Die ISO enthält **keine persönlichen Daten**. Alle Zugänge (Claude-Konto, Pos
 Frigate, Vaultwarden, Home Assistant) werden nach der Installation im Willkommensfenster eingerichtet und im
 KDE-Schlüsselbund gespeichert.
 
+## Auf Kubuntu nachrüsten
+
+Dieselben Bausteine gibt es auch für ein vorhandenes **Kubuntu 25.04 oder neuer** – ohne Neuinstallation:
+
+```sh
+curl -fsSL https://kaschperle8324.github.io/MKO_OS/kubuntu.sh | sudo bash
+```
+
+Einzelheiten und Optionen (alles ohne Rückfrage, nur Bausteine, wieder entfernen) in [kubuntu/](kubuntu/).
+
 ## Updates
 
 Installierte Systeme bekommen neue Versionen der MKO-Bausteine über die signierte Paketquelle

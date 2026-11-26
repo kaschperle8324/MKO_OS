@@ -7,7 +7,7 @@ name: MKO OS Paketquelle
 on:
   push:
     branches: [main]
-    paths: ["*-desktop/**", "desktop-meta/**", ".github/workflows/apt-repo.yml"]
+    paths: ["*-desktop/**", "desktop-meta/**", "kubuntu/**", ".github/workflows/apt-repo.yml"]
   workflow_dispatch:
 
 permissions:
@@ -54,7 +54,7 @@ jobs:
             -o APT::FTPArchive::Release::Codename="stable" \
             -o APT::FTPArchive::Release::Architectures="amd64" \
             -o APT::FTPArchive::Release::Components="main" \
-            -o APT::FTPArchive::Release::Description="MKO OS – Bausteine für Debian 13" \
+            -o APT::FTPArchive::Release::Description="MKO OS – Bausteine für Debian 13 und Kubuntu" \
             release dists/stable > dists/stable/Release
 
       - name: Signieren
@@ -78,6 +78,11 @@ jobs:
           gpgv --keyring /tmp/repo-key.gpg dists/stable/InRelease
           rm -rf "$GNUPGHOME"
 
+      - name: Kubuntu-Installationsskript
+        run: |
+          bash -n kubuntu/installieren.sh
+          install -m644 kubuntu/installieren.sh public/kubuntu.sh
+
       - name: Startseite
         run: |
           cat > public/index.html <<'HTML'
@@ -87,6 +92,12 @@ jobs:
           <h1>MKO OS – Paketquelle</h1>
           <p>Auf MKO OS ist diese Quelle bereits eingetragen; Updates kommen über Discover oder
           <code>sudo apt update &amp;&amp; sudo apt full-upgrade</code>.</p>
+          <h2>Kubuntu (25.04 oder neuer)</h2>
+          <p>Alle MKO-Bausteine auf ein vorhandenes Kubuntu installieren – fragt nach den Zusatzprogrammen:</p>
+          <pre>curl -fsSL https://kaschperle8324.github.io/MKO_OS/kubuntu.sh | sudo bash</pre>
+          <p>Ohne Rückfragen alles: <code>… | sudo bash -s -- --alles</code> · nur die Bausteine:
+          <code>--nur-bausteine</code> · wieder entfernen: <code>--entfernen</code></p>
+          <h2>Debian 13</h2>
           <p>Auf einem anderen Debian 13 von Hand einrichten:</p>
           <pre>curl -fsSL https://kaschperle8324.github.io/MKO_OS/apt/mko-os.asc | sudo gpg --dearmor -o /usr/share/keyrings/mko-os.gpg
           sudo tee /etc/apt/sources.list.d/mko-os.sources &lt;&lt;EOF

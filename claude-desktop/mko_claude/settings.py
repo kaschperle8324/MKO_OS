@@ -104,10 +104,29 @@ def mcp_config() -> Path:
     return path
 
 
+def os_name() -> str:
+    """Name des laufenden Systems für den Hinweis an Claude (MKO OS oder z. B. Kubuntu mit MKO-Bausteinen)."""
+    info = {}
+    try:
+        for line in Path("/etc/os-release").read_text(encoding="utf-8").splitlines():
+            key, _, val = line.partition("=")
+            info[key] = val.strip().strip('"')
+    except OSError:
+        pass
+    if info.get("ID") == "ubuntu" or "ubuntu" in info.get("ID_LIKE", ""):
+        name = info.get("PRETTY_NAME", "Ubuntu")
+        if not name.startswith("Kubuntu"):
+            name = name.replace("Ubuntu", "Kubuntu", 1)
+        return f"{name} mit den MKO-OS-Bausteinen"
+    return "MKO OS (Debian 13"
+
+
 def system_prompt() -> str:
     mount = paperless_mount()
+    system = os_name()
+    where = f"{system}, KDE Plasma 6)" if system.startswith("MKO OS") else f"{system} (KDE Plasma 6)"
     lines = [
-        "Du arbeitest in der Claude-Seitenleiste von MKO OS (Debian 13, KDE Plasma 6) direkt auf dem Rechner "
+        f"Du arbeitest in der Claude-Seitenleiste von {where} direkt auf dem Rechner "
         "des Benutzers. Antworte auf Deutsch, knapp und direkt; die Seitenleiste ist schmal, also kurze Absätze.",
         "Für Desktop-Aktionen stehen die üblichen KDE-Befehle zur Verfügung: xdg-open (Datei/Link öffnen), "
         "dolphin --select <pfad>, notify-send, kioclient, qdbus6, kwriteconfig6. Frage vor Aktionen, die etwas "
