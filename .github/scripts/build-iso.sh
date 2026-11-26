@@ -25,6 +25,24 @@ for script in */packaging/build-deb.sh; do
 done
 ls -l iso/config/packages.chroot/
 
+# Pakete, deren Version schon in der MKO-Paketquelle liegt, von dort nehmen (byte-gleich).
+# Sonst hält apt im fertigen System die lokal gebaute und die veröffentlichte Datei für
+# verschiedene Pakete gleicher Version und will „herunterstufen“.
+install -m644 desktop-meta/data/apt/mko-os.gpg /usr/share/keyrings/mko-os.gpg
+install -m644 desktop-meta/data/apt/mko-os.sources /etc/apt/sources.list.d/mko-os.sources
+if apt-get update -qq; then
+  for deb in iso/config/packages.chroot/*.deb; do
+    name=$(dpkg-deb -f "$deb" Package); ver=$(dpkg-deb -f "$deb" Version)
+    if apt-cache show "$name=$ver" > /dev/null 2>&1; then
+      (cd /tmp && rm -f "${name}"_*.deb && apt-get download -qq "$name=$ver") && mv /tmp/"${name}"_*.deb "$deb" \
+        && echo "aus Paketquelle: $name $ver" || echo "lokal gebaut: $name $ver"
+    else
+      echo "lokal gebaut (noch nicht veröffentlicht): $name $ver"
+    fi
+  done
+fi
+rm -f /etc/apt/sources.list.d/mko-os.sources
+
 # Installierbarkeit vorab prüfen (schneller Fehler statt nach 30 Minuten im ISO-Bau)
 apt-get install -y --dry-run ./iso/config/packages.chroot/*.deb > /dev/null
 
