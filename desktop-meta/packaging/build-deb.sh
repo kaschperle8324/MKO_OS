@@ -14,7 +14,10 @@ mkdir -p "$PY" "$ROOT/usr/bin" "$ROOT/DEBIAN" "$ROOT/usr/share/applications" "$R
 cp -r mko_welcome "$PY/"
 find "$PY" -name __pycache__ -type d -prune -exec rm -rf {} +
 printf '#!/usr/bin/python3\nfrom mko_welcome.app import main\nraise SystemExit(main())\n' > "$ROOT/usr/bin/mko-welcome"
-chmod 755 "$ROOT/usr/bin/mko-welcome"
+printf '#!/usr/bin/python3\nfrom mko_welcome.virenscan import main\nraise SystemExit(main())\n' > "$ROOT/usr/bin/mko-virenscan"
+chmod 755 "$ROOT/usr/bin/mko-welcome" "$ROOT/usr/bin/mko-virenscan"
+mkdir -p "$ROOT/usr/share/kio/servicemenus"
+install -m755 data/servicemenus/mko-virenscan.desktop "$ROOT/usr/share/kio/servicemenus/"
 install -m644 data/mko-welcome.desktop data/mko-tastenkuerzel.desktop "$ROOT/usr/share/applications/"
 install -m644 data/mko-tastenkuerzel-autostart.desktop "$ROOT/etc/xdg/autostart/mko-tastenkuerzel.desktop"
 install -m644 data/mko-welcome-autostart.desktop "$ROOT/etc/xdg/autostart/mko-welcome.desktop"

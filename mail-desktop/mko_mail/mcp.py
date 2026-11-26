@@ -157,9 +157,16 @@ class Server:
         return "Erledigt."
 
     def _attachments(self, uid, konto, ordner):
+        from . import virus
+
         with M.Mailbox(A.find_account(konto)) as mb:
             msg = mb.fetch(uid, ordner)
-        return msg, M.attachments(msg)
+        atts = M.attachments(msg)
+        result = virus.scan(atts) or {}
+        infected = [f"{atts[i].filename} ({sig})" for i, sig in result.items() if sig]
+        if infected:
+            raise M.MailError("Virus gefunden, Anhänge werden nicht weitergegeben: " + ", ".join(infected))
+        return msg, atts
 
     def anhang_speichern(self, uid, konto=None, ordner="INBOX", ziel="~/Downloads", nur=None):
         _, atts = self._attachments(uid, konto, ordner)

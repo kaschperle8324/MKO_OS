@@ -5,7 +5,7 @@ Priority: optional
 Architecture: all
 Maintainer: Markus Kaspar-Otto <@MAIL@>
 Depends: python3 (>= 3.11), python3-imapclient, python3-keyring, python3-pyside6.qtcore, python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, libnotify-bin, xdg-utils
-Recommends: mko-claude (>= 0.2.0), mko-paperless, libkf6config-bin
+Recommends: mko-claude (>= 0.2.0), mko-paperless, clamav, libkf6config-bin
 Suggests: korganizer, kdepim-addons
 Homepage: https://github.com/kaschperle8324/MKO_OS
 Description: E-Mail als Teil des KDE-Desktops

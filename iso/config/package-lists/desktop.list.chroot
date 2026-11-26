@@ -66,6 +66,13 @@ nodejs
 htop
 mpv
 
+# Sicherheit: Virenprüfung auf Abruf, Firewall, automatische Sicherheitsupdates
+clamav
+clamav-freshclam
+ufw
+plasma-firewall
+unattended-upgrades
+
 # Treiber und Firmware
 firmware-linux
 firmware-linux-nonfree

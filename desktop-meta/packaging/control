@@ -5,9 +5,10 @@ Priority: optional
 Architecture: all
 Maintainer: Markus Kaspar-Otto <@MAIL@>
 Depends: python3 (>= 3.11), python3-pyside6.qtwidgets, mko-paperless, mko-claude, mko-mail, mko-dashboard, mko-immich, mko-frigate, mko-vault
-Recommends: korganizer, kdepim-addons, konsole
+Recommends: korganizer, kdepim-addons, konsole, clamav, clamav-freshclam
 Homepage: https://github.com/kaschperle8324/MKO_OS
 Description: MKO OS – Desktop-Bausteine, Erscheinungsbild und Ersteinrichtung
  Zieht alle MKO-OS-Bausteine nach (Claude-Seitenleiste, E-Mail, Paperless,
  Immich, Frigate, Vaultwarden, Haus-Anzeige) und bringt das Willkommensfenster für die
- Ersteinrichtung, Hintergrundbilder und das Logo mit.
+ Ersteinrichtung, die Tastenkürzel-Übersicht, die Virenprüfung auf Abruf
+ (Dolphin: „Auf Viren prüfen“), Hintergrundbilder und das Logo mit.

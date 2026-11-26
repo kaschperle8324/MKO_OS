@@ -16,6 +16,9 @@ direkt eingebaut sind – ohne extra Apps oder Browser-Tabs.
 | [mko-dashboard](dashboard-desktop/) | Haus-Anzeige mit Home-Assistant-Werten (Heizung, PV) auf einem zweiten Bildschirm |
 | [mko-desktop](desktop-meta/) | Willkommensfenster für die Ersteinrichtung, Hintergrundbilder, Logo |
 
+Sicherheit: Virenprüfung auf Abruf (Rechtsklick „Auf Viren prüfen“, Mail-Anhänge werden automatisch geprüft),
+Firewall (eingehend gesperrt) und automatische Debian-Sicherheitsupdates – ohne dauerhaft laufenden Virenscanner.
+
 Dazu auf der ISO: Google Chrome, VSCodium, LibreOffice, GIMP, FileZilla (FTP/SFTP), Remmina, OpenVPN, Docker,
 Claude Code, Bitwarden-CLI, deutsche Sprache und gängige Firmware.
 

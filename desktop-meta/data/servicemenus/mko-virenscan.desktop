@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=all/allfiles;inode/directory;
+Actions=virenscan
+Icon=security-high
+
+[Desktop Action virenscan]
+Name=Auf Viren prüfen
+Icon=security-high
+Exec=mko-virenscan %F

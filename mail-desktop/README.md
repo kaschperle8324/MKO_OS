@@ -1,6 +1,6 @@
 # mko-mail – E-Mail als Teil des KDE-Desktops
 
-Version 0.1.0 · Teil von MKO OS · Lizenz GPL-3.0
+Version 0.1.1 · Teil von MKO OS · Lizenz GPL-3.0
 
 E-Mail ohne eigenes Mailprogramm. Ein Hintergrunddienst hält alle Postfächer
 per IMAP IDLE (Push) im Blick. Neue Mails erscheinen sofort als
@@ -23,7 +23,9 @@ Taskleiste.
   - Lesen ohne externe Inhalte (keine Tracking-Pixel)
   - Antworten, Allen antworten, Weiterleiten (mit Anhängen), Archivieren, Löschen
   - Rechtsklick auf eine Mail: als gelesen oder ungelesen markieren
-- **Anhänge:** öffnen, speichern oder **in Paperless ablegen** (PDFs und Bilder).
+- **Anhänge:** öffnen, speichern oder **in Paperless ablegen** (PDFs und Bilder). Ist ClamAV installiert, werden
+  Anhänge beim Öffnen der Mail im Hintergrund geprüft (✓ bzw. ⚠ am Anhang); bei einem Fund warnt die Anzeige vor dem
+  Öffnen, und der Assistent bekommt solche Anhänge nicht.
 - **Schreiben** in einem eigenen Fenster:
   - Absender aus allen Postfächern wählbar
   - Anhänge, Signatur je Postfach, Entwürfe
@@ -42,7 +44,7 @@ Taskleiste.
 ## Einrichtung
 
 ```sh
-sudo apt install ./mko-mail_0.1.0_all.deb
+sudo apt install ./mko-mail_0.1.1_all.deb
 ```
 
 Nach der nächsten Anmeldung startet der Dienst automatisch. Ohne Postfach
@@ -97,6 +99,7 @@ packaging/build-deb.sh
 
 ## Änderungen
 
+- **0.1.1** – Virenprüfung der Anhänge mit ClamAV (falls installiert).
 - **0.1.0** – Erste Fassung: Postfächer mit Strato- und Google-Vorlage, IMAP-IDLE-Push,
   Benachrichtigungen mit Aktionen, Posteingang-Popup, Schreiben/Antworten/Weiterleiten,
   Anhänge nach Paperless, MCP-Server für Claude, `mailto:`-Handler.

@@ -338,14 +338,60 @@ class InboxPopup(QWidget):
         def done(msg):
             self.current = (acc, s, msg)
             self.r_body.setHtml(M.body_html(msg))
-            for att in M.attachments(msg):
+            atts = M.attachments(msg)
+            self.att_state = {}
+            self.att_buttons = []
+            for att in atts:
                 self._add_attachment(att)
+            self._scan_attachments(atts)
             if not s.seen:
                 s.seen = True
                 self.changed.emit(acc.id)
                 self._render_list()
 
         run_bg(load, done)
+
+    def _scan_attachments(self, atts):
+        """Anhänge im Hintergrund mit ClamAV prüfen; Ergebnis erscheint an den Anhang-Knöpfen."""
+        from . import virus
+
+        if not atts or not virus.scanner():
+            return
+        for att, b in zip(atts, self.att_buttons):
+            self.att_state[id(att)] = "pending"
+            b.setText(f"📎 {att.filename}  (wird geprüft …)")
+        buttons = list(self.att_buttons)
+
+        def done(result):
+            if result is None:     # Prüfung nicht möglich (z. B. Signaturen fehlen noch)
+                for att, b in zip(atts, buttons):
+                    self.att_state[id(att)] = "unknown"
+                    b.setText(f"📎 {att.filename}")
+                return
+            for i, (att, b) in enumerate(zip(atts, buttons)):
+                sig = result.get(i)
+                self.att_state[id(att)] = sig or "ok"
+                b.setText(f"⚠ {att.filename} – {sig}" if sig else f"📎 {att.filename}  ✓")
+                if sig:
+                    b.setStyleSheet("color: #da4453; font-weight: bold;")
+            if any(result.values()):
+                self.status.setText("⚠ Virus in einem Anhang gefunden – nicht öffnen.")
+
+        run_bg(lambda: virus.scan(atts), done, lambda _e: done(None))
+
+    def _attachment_ok(self, att) -> bool:
+        state = getattr(self, "att_state", {}).get(id(att))
+        if state == "pending":
+            return QMessageBox.question(self, "Anhang", "Die Virenprüfung läuft noch. Trotzdem fortfahren?") \
+                == QMessageBox.Yes
+        if state not in (None, "ok", "unknown"):
+            box = QMessageBox(QMessageBox.Warning, "Virus gefunden",
+                              f"In „{att.filename}“ wurde ein Virus gefunden:\n{state}\n\nDer Anhang sollte nicht "
+                              "geöffnet oder gespeichert werden.", QMessageBox.Cancel, self)
+            box.addButton("Trotzdem fortfahren", QMessageBox.DestructiveRole)
+            box.setDefaultButton(QMessageBox.Cancel)
+            return box.exec() != QMessageBox.Cancel
+        return True
 
     def _clear_attachments(self):
         while self.r_att.count():
@@ -365,10 +411,14 @@ class InboxPopup(QWidget):
         if att.content_type in ("application/pdf",) or att.content_type.startswith("image/"):
             menu.addAction(icon("folder-documents"), "In Paperless ablegen", lambda a=att: self._to_paperless(a))
         b.setMenu(menu)
+        if hasattr(self, "att_buttons"):
+            self.att_buttons.append(b)
         self.r_att.addWidget(b)
         self.r_att_box.show()
 
     def _open_attachment(self, att: M.Attachment):
+        if not self._attachment_ok(att):
+            return
         d = tempfile.mkdtemp(prefix="mko-mail-")
         path = os.path.join(d, att.filename)
         with open(path, "wb") as fh:
@@ -376,6 +426,8 @@ class InboxPopup(QWidget):
         subprocess.Popen(["xdg-open", path])
 
     def _save_attachment(self, att: M.Attachment):
+        if not self._attachment_ok(att):
+            return
         target, _ = QFileDialog.getSaveFileName(self, "Anhang speichern",
                                                 os.path.join(os.path.expanduser("~/Downloads"), att.filename))
         if target:
@@ -383,6 +435,8 @@ class InboxPopup(QWidget):
                 fh.write(att.data)
 
     def _to_paperless(self, att: M.Attachment):
+        if not self._attachment_ok(att):
+            return
         subject = self.current[1].subject if self.current else ""
         run_bg(lambda: paperless_upload(att, subject),
                lambda msg: self.status.setText(msg))
