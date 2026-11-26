@@ -11,20 +11,13 @@ mkdir -p iso/config/packages.chroot
 rm -f iso/config/packages.chroot/*.deb
 
 # Alle Paketnamen der Listen vorab prüfen (meldet alle fehlenden auf einmal)
-cat > /etc/apt/sources.list.d/mko-check.sources <<SRC
-Types: deb
-URIs: https://deb.debian.org/debian
-Suites: trixie trixie-updates
-Components: main contrib non-free non-free-firmware
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-SRC
+sed -i "s/^Components: main$/Components: main contrib non-free non-free-firmware/" /etc/apt/sources.list.d/debian.sources
 apt-get update -qq
 missing=""
 for p in $(grep -hv '^\s*#' iso/config/package-lists/*.list.chroot | grep -v '^mko-' | tr -s ' \n' '\n'); do
   apt-cache show "$p" > /dev/null 2>&1 || missing="$missing $p"
 done
 if [ -n "$missing" ]; then echo "FEHLENDE PAKETE:$missing"; exit 1; fi
-rm /etc/apt/sources.list.d/mko-check.sources
 for script in */packaging/build-deb.sh; do
   dir=$(dirname "$(dirname "$script")")
   (cd "$dir" && rm -rf dist && sh packaging/build-deb.sh)
