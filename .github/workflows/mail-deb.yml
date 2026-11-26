@@ -6,37 +6,50 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container: debian:trixie
+  test:
+    # Der Test-Mailserver nutzt die Dovecot-2.3-Konfiguration (Ubuntu 24.04); das Paket selbst wird unten unter Debian 13 gebaut.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Abhängigkeiten
         run: |
-          apt-get update
-          apt-get install -y --no-install-recommends python3 python3-imapclient python3-keyring python3-aiosmtpd \
-            python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork \
-            dovecot-imapd openssl libnotify-bin dpkg-dev fonts-dejavu-core
-          useradd -r -M vmail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends dovecot-imapd openssl libnotify-bin python3-pip \
+            libegl1 libxkbcommon0 libfontconfig1 libdbus-1-3
+          sudo pip install --break-system-packages imapclient aiosmtpd PySide6-Essentials keyring
+          sudo useradd -r -M vmail
       - name: Test gegen lokalen Mailserver
         working-directory: mail-desktop
-        env:
-          QT_QPA_PLATFORM: offscreen
-          MKO_MAIL_PASSWORD: geheim
         run: |
-          python3 tests/mailserver.py start
-          python3 tests/mailserver.py seed
-          python3 - <<'PY'
+          sudo -E env QT_QPA_PLATFORM=offscreen MKO_MAIL_PASSWORD=geheim HOME=/tmp/mailhome bash -c '
+            set -e
+            mkdir -p /tmp/mailhome
+            python3 tests/mailserver.py start
+            python3 tests/mailserver.py seed
+            python3 - <<PY
           import sys; sys.path.insert(0, ".")
           from mko_mail.accounts import Account, save_accounts
           save_accounts([Account.from_preset(a, "custom", imap_host="127.0.0.1", imap_port=10993,
                          smtp_host="127.0.0.1", smtp_port=10465, verify_tls=False)
                          for a in ("konto1@beispiel.de", "konto2@beispiel.de")])
           PY
-          python3 tests/ui_check.py
-      - name: Paket bauen
+            python3 tests/ui_check.py | tee /tmp/ui.log
+            grep -q "push-benachrichtigungen: \[(" /tmp/ui.log
+            python3 tests/mailserver.py stop'
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Paket bauen und Installierbarkeit prüfen
         working-directory: mail-desktop
-        run: packaging/build-deb.sh
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 dpkg-dev
+          packaging/build-deb.sh
+          apt-get install -y --dry-run ./dist/*.deb > /dev/null
       - uses: actions/upload-artifact@v4
         with:
           name: mko-mail-deb
