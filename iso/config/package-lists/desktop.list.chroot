@@ -1,8 +1,23 @@
 # Oberfläche und deutsche Sprache
-task-kde-desktop
+# Schlanke Plasma-Grundausstattung statt task-kde-desktop (spart u. a. die komplette KDE-PIM-Suite mit
+# Datenbankserver, Spiele, Firefox und Thunderbird)
+kde-plasma-desktop
 task-german
-task-german-kde-desktop
 sddm
+sddm-theme-breeze
+xdg-desktop-portal-kde
+kwalletmanager
+polkit-kde-agent-1
+plasma-discover
+kio-extras
+ffmpegthumbs
+kdegraphics-thumbnailers
+partitionmanager
+print-manager
+cups
+pipewire-audio
+fonts-noto-core
+fonts-noto-color-emoji
 konsole
 dolphin
 kate
