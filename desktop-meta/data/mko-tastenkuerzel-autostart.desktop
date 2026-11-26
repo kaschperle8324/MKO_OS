@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Tastenkürzel (bei der Anmeldung)
+Exec=mko-welcome --tastenkuerzel --autostart
+Icon=input-keyboard
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

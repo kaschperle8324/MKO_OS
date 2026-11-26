@@ -85,6 +85,13 @@ def apply_look() -> None:
 
 def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if "--tastenkuerzel" in argv:
+        from .shortcuts import main as shortcuts_main
+
+        # beim allerersten Anmelden zeigt das Willkommensfenster die Kürzel bereits
+        if "--autostart" in argv and not MARKER.exists():
+            return 0
+        return shortcuts_main(autostart="--autostart" in argv)
     first = "--firstlogin" in argv
     if first:
         if MARKER.exists():
@@ -159,11 +166,14 @@ def main(argv=None) -> int:
     timer.timeout.connect(refresh)
     timer.start()
 
+    more = QPushButton("Alle Tastenkürzel …")
+    more.clicked.connect(lambda: subprocess.Popen(["mko-welcome", "--tastenkuerzel"]))
     keys = QLabel("<b>Tastenkürzel:</b> Super+C Claude · Super+Umschalt+P Passwörter · Alt+Leertaste Suche (auch Paperless, Fotos, „pw …“) · "
                   "Super+Umschalt+H Haus-Anzeige")
     keys.setWordWrap(True)
     lay.addWidget(keys)
     bottom = QHBoxLayout()
+    bottom.addWidget(more)
     again = QCheckBox("Beim Anmelden nicht mehr anzeigen")
     again.setChecked(True)
     bottom.addWidget(again)

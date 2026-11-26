@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Tastenkürzel
+Comment=Übersicht aller Tastenkürzel von MKO OS
+Exec=mko-welcome --tastenkuerzel
+Icon=input-keyboard
+Categories=Settings;System;
+Keywords=Kürzel;Shortcuts;Tastatur;Hilfe;
