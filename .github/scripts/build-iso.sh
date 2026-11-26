@@ -7,6 +7,7 @@ apt-get install -y --no-install-recommends live-build python3 dpkg-dev ca-certif
   debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed shim-signed \
   mtools dosfstools syslinux syslinux-common isolinux
 
+mkdir -p iso/config/packages.chroot
 rm -f iso/config/packages.chroot/*.deb
 for script in */packaging/build-deb.sh; do
   dir=$(dirname "$(dirname "$script")")
