@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Fotos (Immich)
+Comment=Immich-Fotos im Dateimanager öffnen
+Exec=mko-immich browse
+Icon=folder-pictures
+Categories=Graphics;Photography;
+Keywords=Immich;Fotos;Bilder;Alben;
+NoDisplay=false
+X-KDE-StartupNotify=false

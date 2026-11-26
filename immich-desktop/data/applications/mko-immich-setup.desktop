@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Immich einrichten
+Comment=Verbindung zum eigenen Immich-Fotoserver herstellen
+Exec=mko-immich setup --gui
+Icon=folder-pictures
+Categories=Settings;Graphics;
+Keywords=Immich;Fotos;Bilder;

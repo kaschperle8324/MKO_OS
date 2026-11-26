@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Paperless einrichten
+Comment=Verbindung zu Paperless-ngx herstellen
+Exec=mko-paperless setup --gui
+Icon=folder-documents
+Categories=Settings;Office;
+Keywords=Paperless;Dokumente;DMS;

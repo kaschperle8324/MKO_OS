@@ -1,0 +1,39 @@
+name: mko-immich .deb
+
+on:
+  push:
+    paths: ["immich-desktop/**", ".github/workflows/immich-deb.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Abhängigkeiten
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 python3-requests python3-pyfuse3 \
+            python3-trio python3-dbus-next python3-keyring python3-aiohttp python3-pyside6.qtgui \
+            fuse3 dbus dpkg-dev
+      - name: Selbsttest gegen Immich-Nachbau
+        working-directory: immich-desktop
+        env:
+          IMMICH_URL: http://127.0.0.1:8766
+          IMMICH_API_KEY: testkey
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python3 tests/mock_immich.py 8766 &
+          sleep 2
+          python3 -m mko_immich status
+          python3 -m mko_immich search strand
+          dbus-run-session -- python3 tests/dbus_check.py
+          python3 tests/mcp_check.py
+      - name: Paket bauen
+        working-directory: immich-desktop
+        run: packaging/build-deb.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mko-immich-deb
+          path: immich-desktop/dist/*.deb

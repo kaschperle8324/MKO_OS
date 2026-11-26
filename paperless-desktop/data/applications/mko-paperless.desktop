@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Paperless
+Comment=Paperless-Laufwerk öffnen
+Exec=mko-paperless browse
+Icon=folder-documents
+Categories=Office;
+NoDisplay=false
+X-KDE-StartupNotify=false

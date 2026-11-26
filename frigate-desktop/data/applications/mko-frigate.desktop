@@ -1,0 +1,26 @@
+[Desktop Entry]
+Type=Application
+Name=Kameras (Frigate)
+GenericName=Videoüberwachung
+Comment=Kamerabilder und Ereignisse aus Frigate NVR anzeigen
+Exec=mko-frigate toggle
+Icon=camera-web
+Categories=AudioVideo;Video;
+Keywords=Kamera;Kameras;Frigate;NVR;Überwachung;Videoüberwachung;RTSP;
+StartupNotify=false
+Actions=show;wall;setup;
+
+[Desktop Action wall]
+Name=Kamerawand
+Exec=mko-frigate wall
+Icon=view-fullscreen
+
+[Desktop Action setup]
+Name=Frigate einrichten
+Exec=mko-frigate setup --gui
+Icon=configure
+
+[Desktop Action show]
+Name=Kameras anzeigen
+Exec=mko-frigate show
+Icon=camera-web

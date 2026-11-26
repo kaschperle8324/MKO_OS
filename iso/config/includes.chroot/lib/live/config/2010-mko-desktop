@@ -1,0 +1,12 @@
+#!/bin/sh
+# Live-System: Starter „MKO OS installieren“ auf den Schreibtisch legen
+USER_NAME="${LIVE_USERNAME:-live}"
+SRC=$(ls /usr/share/applications/install-debian.desktop /usr/share/applications/calamares.desktop 2>/dev/null | head -n1)
+[ -n "$SRC" ] || exit 0
+for DIR in Desktop Schreibtisch; do
+  D="/home/${USER_NAME}/${DIR}"
+  mkdir -p "$D"
+  cp "$SRC" "$D/mko-installieren.desktop"
+  chmod +x "$D/mko-installieren.desktop"
+done
+chown -R "${USER_NAME}:${USER_NAME}" "/home/${USER_NAME}/Desktop" "/home/${USER_NAME}/Schreibtisch" 2>/dev/null || true

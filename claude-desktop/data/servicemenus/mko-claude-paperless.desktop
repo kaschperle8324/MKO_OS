@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=application/pdf;image/jpeg;image/png;image/tiff;
+Actions=paperless
+X-KDE-Submenu=Claude
+Icon=mko-claude
+
+[Desktop Action paperless]
+Name=Mit Claude in Paperless ablegen
+Icon=folder-documents
+Exec=mko-claude ask --action paperless --files %F

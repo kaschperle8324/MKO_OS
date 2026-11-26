@@ -1,0 +1,9 @@
+#!/bin/sh
+# Systemweite Voreinstellungen (keine persönlichen Daten)
+set -e
+# Docker für Benutzer der Gruppe docker; Dienst startet erst bei Bedarf
+systemctl disable docker.service docker.socket 2>/dev/null || true
+systemctl enable docker.socket 2>/dev/null || true
+# Neue Benutzer automatisch in sinnvolle Gruppen
+sed -i 's/^#\?EXTRA_GROUPS=.*/EXTRA_GROUPS="audio video plugdev netdev bluetooth lpadmin scanner docker"/' /etc/adduser.conf
+sed -i 's/^#\?ADD_EXTRA_GROUPS=.*/ADD_EXTRA_GROUPS=1/' /etc/adduser.conf

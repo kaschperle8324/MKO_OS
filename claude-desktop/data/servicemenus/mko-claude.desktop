@@ -1,0 +1,22 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=all/allfiles;inode/directory;
+Actions=fragen;zusammenfassen;erklaeren
+X-KDE-Submenu=Claude
+Icon=mko-claude
+
+[Desktop Action fragen]
+Name=Claude fragen …
+Icon=mko-claude
+Exec=mko-claude ask --action fragen --files %F
+
+[Desktop Action zusammenfassen]
+Name=Zusammenfassen
+Icon=view-list-text
+Exec=mko-claude ask --action zusammenfassen --files %F
+
+[Desktop Action erklaeren]
+Name=Erklären: Was muss ich tun?
+Icon=help-about
+Exec=mko-claude ask --action erklaeren --files %F

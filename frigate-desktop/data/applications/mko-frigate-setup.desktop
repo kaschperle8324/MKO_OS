@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Frigate einrichten
+GenericName=Kameras einrichten
+Comment=Verbindung zum Frigate-Server (Kameras) einrichten
+Exec=mko-frigate setup --gui
+Icon=camera-web
+Categories=Settings;
+Keywords=Kamera;Frigate;NVR;Einrichten;
+StartupNotify=false

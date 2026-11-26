@@ -1,0 +1,18 @@
+#!/bin/sh
+# Google Chrome und VSCodium aus den Paketquellen der Hersteller (bleiben für Updates eingetragen)
+set -e
+install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /etc/apt/keyrings/google-chrome.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main" \
+  > /etc/apt/sources.list.d/google-chrome.list
+curl -fsSL https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg | gpg --dearmor -o /etc/apt/keyrings/vscodium.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/vscodium.gpg] https://download.vscodium.com/debs vscodium main" \
+  > /etc/apt/sources.list.d/vscodium.list
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-stable codium
+# Chrome legt eine eigene Quelle an – doppelte Einträge entfernen
+for f in /etc/apt/sources.list.d/google-chrome*.list; do
+  [ "$f" = /etc/apt/sources.list.d/google-chrome.list ] || rm -f "$f"
+done
+# Chrome als Standardbrowser
+update-alternatives --set x-www-browser /usr/bin/google-chrome-stable || true

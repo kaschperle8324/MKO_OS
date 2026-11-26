@@ -1,0 +1,14 @@
+[Unit]
+Description=Paperless als Laufwerk im Persönlichen Ordner
+Documentation=https://github.com/kaschperle8324/MKO_OS
+ConditionPathExists=%h/.config/mko-os/paperless.toml
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mko-paperless mount
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=15
+
+[Install]
+WantedBy=default.target

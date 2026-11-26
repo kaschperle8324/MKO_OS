@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Willkommen bei MKO OS
+Comment=Claude, E-Mail, Paperless, Immich, Frigate und Home Assistant verbinden
+Exec=mko-welcome
+Icon=mko-os
+Categories=Settings;System;

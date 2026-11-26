@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=Haus-Anzeige
+GenericName=Home-Assistant-Anzeige
+Comment=Heizung und PV-Anlage auf dem 4:3-Bildschirm ein- oder ausschalten
+Exec=mko-dashboard toggle
+Icon=utilities-system-monitor
+Categories=Utility;
+Keywords=Home Assistant;Heizung;Wärmepumpe;PV;Photovoltaik;Dashboard;
+StartupNotify=false
+X-KDE-Shortcuts=Meta+Shift+H
+Actions=setup;
+
+[Desktop Action setup]
+Name=Verbindung zu Home Assistant …
+Exec=mko-dashboard setup

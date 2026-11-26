@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Haus-Anzeige (Hintergrund)
+Exec=mko-dashboard daemon
+Icon=utilities-system-monitor
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

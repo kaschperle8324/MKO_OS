@@ -1,0 +1,33 @@
+name: mko-dashboard .deb
+
+on:
+  push:
+    paths: ["dashboard-desktop/**", ".github/workflows/claude-deb.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Abhängigkeiten
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 python3-pyside6.qtcore python3-pyside6.qtgui \
+            python3-pyside6.qtwidgets python3-pyside6.qtnetwork python3-pyside6.qtwebsockets python3-keyring python3-aiohttp dpkg-dev fonts-dejavu-core
+      - name: Oberflächentest gegen HA-Nachbau
+        working-directory: dashboard-desktop
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python3 tests/mock_ha.py 8123 &
+          sleep 2
+          python3 tests/ui_check.py
+      - name: Paket bauen
+        working-directory: dashboard-desktop
+        run: packaging/build-deb.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mko-dashboard-deb
+          path: dashboard-desktop/dist/*.deb

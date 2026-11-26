@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+Name=Claude
+GenericName=KI-Assistent
+Comment=Claude-Seitenleiste öffnen oder schließen
+Exec=mko-claude toggle
+Icon=mko-claude
+Categories=Utility;
+Keywords=KI;AI;Assistent;Claude;
+StartupNotify=false
+X-KDE-Shortcuts=Meta+C
+Actions=new;
+
+[Desktop Action new]
+Name=Neues Gespräch
+Exec=mko-claude show

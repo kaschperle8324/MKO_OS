@@ -1,0 +1,22 @@
+dist/
+__pycache__/
+*.pyc
+# live-build Arbeitsdateien
+iso/.build/
+iso/cache/
+iso/chroot/
+iso/binary/
+iso/local/
+iso/*.iso
+iso/*.contents
+iso/*.files
+iso/*.packages
+iso/*.sha256*
+iso/*.log
+iso/config/packages.chroot/*.deb
+iso/config/bootloaders/
+iso/config/binary
+iso/config/bootstrap
+iso/config/chroot
+iso/config/common
+iso/config/source

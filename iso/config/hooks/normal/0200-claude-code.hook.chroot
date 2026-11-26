@@ -1,0 +1,6 @@
+#!/bin/sh
+# Claude Code systemweit (die Anmeldung erfolgt später pro Benutzer)
+set -e
+npm install -g @anthropic-ai/claude-code
+npm cache clean --force
+command -v claude

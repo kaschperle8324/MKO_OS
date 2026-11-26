@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Claude (Hintergrund)
+Exec=mko-claude daemon
+Icon=mko-claude
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

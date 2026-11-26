@@ -1,0 +1,103 @@
+# Aufbau der Haus-Anzeige (MKO OS)
+#
+# Platzhalter in geschweiften Klammern: {AUSDRUCK|FILTER:ARGUMENTE}
+#   AUSDRUCK  Entitäts-IDs und Grundrechenarten, z. B. sensor.pv_power + sensor.pv_anlage_terrasse_gesamtleistung
+#   FILTER    power          Watt automatisch als W oder kW
+#             num:1          Zahl mit 1 Nachkommastelle (Standard 0)
+#             abspower       Betrag als Leistung (ohne Vorzeichen)
+#             sign:Bezug:Einspeisung   nur der Text je nach Vorzeichen (für badge)
+#             flow:Bezug:Einspeisung   Text und Betrag zusammen
+#             map:HEATING=Heizen,STANDBY=Bereit   Texte übersetzen
+#             text           Zustand unverändert
+# Fehlende oder nicht verfügbare Entitäten erscheinen als „–“.
+#
+# Kacheln:  title, badge (kleines Etikett rechts oben), value, unit (optional, wenn der Filter keine Einheit liefert), sub, spark (Ausdruck für
+#           den Verlauf), spark_hours, gauge (0–100), alert (Bedingung -> rot), color, span (Spalten)
+#
+# Hinweis: sensor.stromleser_e320_power_in_ha meldet „kW“, liefert aber Watt – deshalb ohne Umrechnung als Watt.
+
+[header]
+temperature = "{sensor.heizung_outdoor_temperature|num:1} °C"
+chips = [
+  "{sensor.heizung_energy_manager_state|map:HEATING=Heizbetrieb,STANDBY=Bereitschaft,DOMESTIC_HOT_WATER=Warmwasser,IDLE=Bereitschaft,COOLING=Kühlen}",
+  "Netz: {sensor.on_grid_mode|map:Importing=Bezug,Exporting=Einspeisung,Idle=Ruhe}",
+]
+
+[[section]]
+title = "Energie"
+columns = 4
+
+[[section.tile]]
+title = "PV-Erzeugung"
+value = "{sensor.pv_power + sensor.pv_anlage_terrasse_gesamtleistung|power}"
+sub = "Dach {sensor.pv_power|power} · Terrasse {sensor.pv_anlage_terrasse_gesamtleistung|power}\nHeute {sensor.pv_anlagen_tages_gesamt_produktion|num:1} kWh"
+spark = "sensor.pv_power + sensor.pv_anlage_terrasse_gesamtleistung"
+color = "#f6c344"
+
+[[section.tile]]
+title = "Hausverbrauch"
+value = "{sensor.pv_power + sensor.pv_anlage_terrasse_gesamtleistung + sensor.battery_power + sensor.stromleser_e320_power_in_ha|power}"
+sub = "davon Wärmepumpe {sensor.ebusd_hmu_currentconsumedpower * 1000|power}"
+spark = "sensor.pv_power + sensor.pv_anlage_terrasse_gesamtleistung + sensor.battery_power + sensor.stromleser_e320_power_in_ha"
+color = "#5aa9e6"
+
+[[section.tile]]
+title = "Batterie"
+value = "{sensor.battery_state_of_charge|num} %"
+badge = "{sensor.battery_power|sign:entlädt:lädt}"
+gauge = "sensor.battery_state_of_charge"
+sub = "{sensor.battery_power|abspower}\nHeute ↑ {sensor.today_battery_charge|num:1} · ↓ {sensor.today_battery_discharge|num:1} kWh"
+color = "#3ec27f"
+
+[[section.tile]]
+title = "Netz"
+value = "{sensor.stromleser_e320_power_in_ha|abspower}"
+badge = "{sensor.stromleser_e320_power_in_ha|sign:Bezug:Einspeisung}"
+sub = "Zähler ↓ {sensor.stromleser_e320_total_in_ha|num} · ↑ {sensor.stromleser_e320_total_out_ha|num} kWh"
+spark = "sensor.stromleser_e320_power_in_ha"
+color = "#b48cf2"
+
+[[section]]
+title = "Heizung"
+columns = 3
+
+[[section.tile]]
+title = "Wärmepumpe"
+value = "{sensor.ebusd_hmu_currentconsumedpower * 1000|power}"
+sub = "Wärme {sensor.ebusd_hmu_currentyieldpower * 1000|power} · COP {sensor.wp_cop_aktuell|num:1}"
+spark = "sensor.ebusd_hmu_currentconsumedpower * 1000"
+color = "#ff8c5a"
+
+[[section.tile]]
+title = "Vorlauf"
+value = "{sensor.heizung_circuit_0_current_flow_temperature|num:1} °C"
+sub = "Soll {sensor.heizung_heizung_circuit_0_flow_temperature_setpoint|num:1} °C"
+spark = "sensor.heizung_circuit_0_current_flow_temperature"
+color = "#ff6b6b"
+
+[[section.tile]]
+title = "Wohnraum"
+value = "{sensor.heizung_zone_1_circuit_0_current_temperature|num:1} °C"
+sub = "Soll {sensor.heizung_zone_1_circuit_0_desired_heating_temperature|num:1} °C · Feuchte {sensor.heizung_zone_1_circuit_0_humidity|num} %"
+spark = "sensor.heizung_zone_1_circuit_0_current_temperature"
+color = "#ffd166"
+
+[[section.tile]]
+title = "Warmwasser"
+value = "{sensor.heizung_domestic_hot_water_0_tank_temperature|num:1} °C"
+sub = "Soll {sensor.heizung_domestic_hot_water_0_setpoint|num:1} °C"
+spark = "sensor.heizung_domestic_hot_water_0_tank_temperature"
+color = "#4ecdc4"
+
+[[section.tile]]
+title = "Heizung heute"
+value = "{sensor.heizung_tag|num:1} kWh"
+sub = "Strom für die Heizung\nWärmeertrag {sensor.ebusd_hmu_yieldhcday|num:1} kWh"
+color = "#ff8c5a"
+
+[[section.tile]]
+title = "Anlagendruck"
+value = "{sensor.heizung_system_water_pressure|num:1} bar"
+sub = "Warnung unter 1,2 bar"
+alert = "sensor.heizung_system_water_pressure < 1.2"
+color = "#8fa3b8"

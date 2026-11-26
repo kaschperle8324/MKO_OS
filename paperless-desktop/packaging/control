@@ -1,0 +1,17 @@
+Package: mko-paperless
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Markus Kaspar-Otto <@MAIL@>
+Depends: python3 (>= 3.11), python3-requests, python3-pyfuse3, python3-trio, python3-dbus-next, python3-keyring, fuse3, xdg-utils
+Recommends: kdialog, dolphin, plasma-workspace
+Homepage: https://github.com/kaschperle8324/MKO_OS
+Description: Paperless-ngx als Teil des KDE-Desktops
+ Bindet ein Paperless-ngx-Dokumentenarchiv in den Desktop ein:
+  - Laufwerk im Dateimanager (Posteingang, Korrespondenten, Dokumenttypen,
+    Tags, Jahre, gespeicherte Suchen, Hochladen per Kopieren)
+  - Tags bearbeiten direkt in Dolphin
+  - Volltextsuche in KRunner (Alt+Leertaste)
+  - Benachrichtigungen bei neuen Dokumenten im Posteingang
+ Teil von MKO OS.

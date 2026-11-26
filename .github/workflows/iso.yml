@@ -1,0 +1,84 @@
+name: MKO OS ISO
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Als GitHub-Release veröffentlichen"
+        type: boolean
+        default: true
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  iso:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Speicherplatz freimachen
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost
+          sudo docker image prune --all --force
+          df -h /
+
+      - name: Pakete und ISO bauen (Debian 13)
+        run: |
+          docker run --rm --privileged -v "$GITHUB_WORKSPACE":/w -w /w debian:trixie bash .github/scripts/build-iso.sh
+
+      - name: ISO vorbereiten
+        id: iso
+        run: |
+          cd iso
+          sudo chown -R "$(id -u)":"$(id -g)" .
+          ISO=$(ls *.iso | head -n1)
+          NAME="MKO-OS-$(date +%Y.%m.%d)-amd64.iso"
+          mv "$ISO" "../$NAME"
+          cd ..
+          sha256sum "$NAME" > "$NAME.sha256"
+          SIZE=$(stat -c %s "$NAME")
+          echo "Größe: $((SIZE / 1024 / 1024)) MB"
+          FILES="$NAME.sha256"
+          if [ "$SIZE" -gt 2000000000 ]; then
+            # GitHub-Releases erlauben max. 2 GB je Datei: in Teile zerlegen
+            split -b 1900M -d -a 2 "$NAME" "$NAME.part"
+            FILES="$FILES $(ls $NAME.part*)"
+          else
+            FILES="$FILES $NAME"
+          fi
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+          ls -lh MKO-OS-*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mko-os-iso
+          path: MKO-OS-*
+          retention-days: 14
+          compression-level: 0
+
+      - name: Release veröffentlichen
+        if: startsWith(github.ref, 'refs/tags/') || inputs.release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          case "$TAG" in v*) ;; *) TAG="build-$(date +%Y%m%d-%H%M)";; esac
+          NOTES="Live-ISO von MKO OS (Debian 13, KDE Plasma).
+
+          Herunterladen, auf einen USB-Stick schreiben (z. B. mit Ventoy, balenaEtcher oder dd), davon starten.
+          Im Live-System lässt sich alles ausprobieren; installiert wird über „MKO OS installieren“ auf dem Schreibtisch.
+
+          Liegt die ISO in Teilen vor (.part00, .part01 …), vorher zusammenfügen:
+          Linux/macOS: cat ${{ steps.iso.outputs.name }}.part* > ${{ steps.iso.outputs.name }}
+          Windows: copy /b ${{ steps.iso.outputs.name }}.part00 + ${{ steps.iso.outputs.name }}.part01 ${{ steps.iso.outputs.name }}
+          Prüfsumme: sha256sum -c ${{ steps.iso.outputs.name }}.sha256"
+          gh release create "$TAG" ${{ steps.iso.outputs.files }} --title "MKO OS ${TAG}" --notes "$NOTES"
+
+      - name: Build-Protokoll bei Fehler
+        if: failure()
+        run: tail -n 200 iso/build.log || true

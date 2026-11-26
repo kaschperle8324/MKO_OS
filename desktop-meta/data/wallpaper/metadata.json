@@ -1,0 +1,8 @@
+{
+    "KPlugin": {
+        "Authors": [{"Name": "MKO OS"}],
+        "Id": "MKO-OS",
+        "License": "GPL-3.0",
+        "Name": "MKO OS"
+    }
+}

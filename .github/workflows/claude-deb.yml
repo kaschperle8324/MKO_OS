@@ -1,0 +1,30 @@
+name: mko-claude .deb
+
+on:
+  push:
+    paths: ["claude-desktop/**", ".github/workflows/claude-deb.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Abhängigkeiten
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 python3-pyside6.qtcore python3-pyside6.qtgui \
+            python3-pyside6.qtwidgets python3-pyside6.qtnetwork dpkg-dev fonts-dejavu-core
+      - name: Oberflächentest mit Claude-Attrappe
+        working-directory: claude-desktop
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: MKO_CLAUDE_BIN=$PWD/tests/fake_claude.py python3 tests/ui_check.py
+      - name: Paket bauen
+        working-directory: claude-desktop
+        run: packaging/build-deb.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mko-claude-deb
+          path: claude-desktop/dist/*.deb

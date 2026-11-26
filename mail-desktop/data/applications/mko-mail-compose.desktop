@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=E-Mail schreiben
+Exec=mko-mail compose %u
+Icon=mail-message-new
+MimeType=x-scheme-handler/mailto;
+NoDisplay=true
+StartupNotify=false

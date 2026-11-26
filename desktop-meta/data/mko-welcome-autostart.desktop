@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Willkommen bei MKO OS (erste Anmeldung)
+Exec=mko-welcome --firstlogin
+Icon=mko-os
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

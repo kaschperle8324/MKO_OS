@@ -1,0 +1,16 @@
+#!/bin/sh
+# Installationsprogramm: MKO-Branding, deutsche Voreinstellungen, Starter umbenennen
+set -e
+C=/etc/calamares
+if [ -f "$C/settings.conf" ]; then
+  sed -i 's/^branding:.*/branding: mko/' "$C/settings.conf"
+fi
+if [ -f "$C/modules/locale.conf" ]; then
+  sed -i -e 's/^\(\s*\)region:.*/\1region: "Europe"/' -e 's/^\(\s*\)zone:.*/\1zone: "Berlin"/' "$C/modules/locale.conf"
+  grep -q '^region:' "$C/modules/locale.conf" || printf 'region: "Europe"\nzone: "Berlin"\n' >> "$C/modules/locale.conf"
+fi
+for f in /usr/share/applications/install-debian.desktop /usr/share/applications/calamares.desktop; do
+  [ -f "$f" ] || continue
+  sed -i -e 's/^Name=.*/Name=MKO OS installieren/' -e 's/^Name\[de\]=.*/Name[de]=MKO OS installieren/' \
+         -e 's/^Icon=.*/Icon=mko-os/' "$f"
+done

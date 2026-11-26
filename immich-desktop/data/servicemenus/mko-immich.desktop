@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Service
+X-KDE-ServiceTypes=KonqPopupMenu/Plugin
+MimeType=image/*;video/*;
+Actions=hochladen;album
+X-KDE-Submenu=Immich
+Icon=folder-pictures
+
+[Desktop Action hochladen]
+Name=In Immich hochladen
+Icon=cloud-upload
+Exec=mko-immich upload --gui %F
+
+[Desktop Action album]
+Name=In Immich-Album hochladen …
+Icon=folder-pictures
+Exec=mko-immich upload --gui --choose-album %F

@@ -1,0 +1,13 @@
+Package: mko-desktop
+Version: @VERSION@
+Section: metapackages
+Priority: optional
+Architecture: all
+Maintainer: Markus Kaspar-Otto <@MAIL@>
+Depends: python3 (>= 3.11), python3-pyside6.qtwidgets, mko-paperless, mko-claude, mko-mail, mko-dashboard, mko-immich, mko-frigate
+Recommends: korganizer, kdepim-addons, konsole
+Homepage: https://github.com/kaschperle8324/MKO_OS
+Description: MKO OS – Desktop-Bausteine, Erscheinungsbild und Ersteinrichtung
+ Zieht alle MKO-OS-Bausteine nach (Claude-Seitenleiste, E-Mail, Paperless,
+ Immich, Frigate, Haus-Anzeige) und bringt das Willkommensfenster für die
+ Ersteinrichtung, Hintergrundbilder und das Logo mit.

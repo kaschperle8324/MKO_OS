@@ -1,0 +1,14 @@
+[Unit]
+Description=Benachrichtigungen für neue Dokumente im Paperless-Posteingang
+ConditionPathExists=%h/.config/mko-os/paperless.toml
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mko-paperless notify
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=graphical-session.target

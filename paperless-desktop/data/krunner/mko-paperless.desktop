@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Paperless
+Comment=Dokumente in Paperless-ngx durchsuchen
+Icon=folder-documents
+Type=Service
+X-KDE-ServiceTypes=Plasma/Runner
+X-KDE-PluginInfo-Name=mko-paperless
+X-KDE-PluginInfo-Author=MKO OS
+X-KDE-PluginInfo-License=GPL-3.0
+X-KDE-PluginInfo-EnabledByDefault=true
+X-Plasma-API=DBus
+X-Plasma-DBusRunner-Service=de.mkoos.PaperlessRunner
+X-Plasma-DBusRunner-Path=/runner
+X-Plasma-Request-Actions-Once=true
+X-Plasma-Runner-Min-Letter-Count=3

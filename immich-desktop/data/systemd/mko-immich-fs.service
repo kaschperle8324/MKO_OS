@@ -1,0 +1,15 @@
+[Unit]
+Description=Immich-Fotos als Laufwerk im Persönlichen Ordner
+Documentation=https://github.com/kaschperle8324/MKO_OS
+ConditionPathExists=%h/.config/mko-os/immich.toml
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mko-immich mount
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=15
+
+[Install]
+WantedBy=default.target

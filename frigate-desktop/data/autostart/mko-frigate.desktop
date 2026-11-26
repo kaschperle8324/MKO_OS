@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Kameras (Hintergrund)
+Exec=mko-frigate daemon
+Icon=camera-web
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

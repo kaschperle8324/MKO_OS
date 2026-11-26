@@ -1,0 +1,25 @@
+#!/bin/sh
+# live-build-Konfiguration für MKO OS (Debian 13 „trixie“, amd64, KDE Plasma)
+set -e
+lb config noauto \
+  --distribution trixie \
+  --architectures amd64 \
+  --archive-areas "main contrib non-free non-free-firmware" \
+  --mirror-bootstrap "https://deb.debian.org/debian/" \
+  --mirror-chroot "https://deb.debian.org/debian/" \
+  --mirror-binary "https://deb.debian.org/debian/" \
+  --security true \
+  --updates true \
+  --debian-installer none \
+  --binary-images iso-hybrid \
+  --iso-volume "MKO_OS" \
+  --iso-application "MKO OS" \
+  --iso-publisher "MKO OS" \
+  --image-name "MKO-OS" \
+  --bootappend-live "boot=live components quiet splash locales=de_DE.UTF-8 keyboard-layouts=de timezone=Europe/Berlin username=live hostname=mko-os" \
+  --firmware-chroot true \
+  --firmware-binary true \
+  --apt-recommends true \
+  --memtest none \
+  --checksums sha256 \
+  "${@}"

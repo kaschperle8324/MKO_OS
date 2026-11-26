@@ -1,0 +1,24 @@
+[Desktop Entry]
+Type=Application
+Name=E-Mail
+GenericName=Posteingang
+Comment=Posteingang aller Postfächer öffnen
+Exec=mko-mail toggle
+Icon=internet-mail
+Categories=Office;Email;Network;
+Keywords=Mail;E-Mail;Posteingang;Strato;IMAP;
+StartupNotify=false
+Actions=compose;add;accounts;
+
+[Desktop Action compose]
+Name=Neue E-Mail
+Exec=mko-mail compose
+Icon=mail-message-new
+
+[Desktop Action add]
+Name=Postfach hinzufügen
+Exec=mko-mail add
+
+[Desktop Action accounts]
+Name=Postfächer verwalten
+Exec=mko-mail accounts

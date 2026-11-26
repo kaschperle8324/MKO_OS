@@ -1,0 +1,15 @@
+Package: mko-dashboard
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Markus Kaspar-Otto <@MAIL@>
+Depends: python3 (>= 3.11), python3-pyside6.qtcore, python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, python3-pyside6.qtwebsockets, python3-keyring
+Recommends: libkf6config-bin, kate
+Homepage: https://github.com/kaschperle8324/MKO_OS
+Description: Home-Assistant-Werte dauerhaft auf einem Bildschirm
+ Zeigt Heizung (Wärmepumpe, Vorlauf, Raum, Warmwasser) und PV-Anlage
+ (Erzeugung, Hausverbrauch, Batterie, Netz) live aus Home Assistant als
+ Vollbild auf dem 4:3-Bildschirm – hinter allen Fenstern wie ein
+ Hintergrundbild. Ein-/ausschaltbar über Taskleiste und Super+Umschalt+H.
+ Teil von MKO OS.

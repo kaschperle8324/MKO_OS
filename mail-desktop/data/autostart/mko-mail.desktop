@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=E-Mail (Hintergrund)
+Exec=mko-mail daemon
+Icon=internet-mail
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

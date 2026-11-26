@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Immich-Fotos
+Comment=Fotos in Immich inhaltlich durchsuchen
+Icon=folder-pictures
+Type=Service
+X-KDE-ServiceTypes=Plasma/Runner
+X-KDE-PluginInfo-Name=mko-immich
+X-KDE-PluginInfo-Author=MKO OS
+X-KDE-PluginInfo-License=GPL-3.0
+X-KDE-PluginInfo-EnabledByDefault=true
+X-Plasma-API=DBus
+X-Plasma-DBusRunner-Service=de.mkoos.ImmichRunner
+X-Plasma-DBusRunner-Path=/runner
+X-Plasma-Request-Actions-Once=true
+X-Plasma-Runner-Min-Letter-Count=3
