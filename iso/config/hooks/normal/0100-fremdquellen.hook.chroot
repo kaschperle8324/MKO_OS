@@ -8,7 +8,7 @@ echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/google-chrome.gpg] https://dl.
 curl -fsSL https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg | gpg --dearmor -o /etc/apt/keyrings/vscodium.gpg
 echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/vscodium.gpg] https://download.vscodium.com/debs vscodium main" \
   > /etc/apt/sources.list.d/vscodium.list
-apt-get update
+apt-get update || true   # eine noch nicht erreichbare Zusatzquelle (z. B. MKO-Paketquelle) soll den Bau nicht stoppen
 DEBIAN_FRONTEND=noninteractive apt-get install -y google-chrome-stable codium
 # Chrome legt eine eigene Quelle an – doppelte Einträge entfernen
 for f in /etc/apt/sources.list.d/google-chrome*.list; do

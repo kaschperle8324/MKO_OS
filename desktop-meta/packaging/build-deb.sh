@@ -24,9 +24,15 @@ install -m644 data/mko-welcome-autostart.desktop "$ROOT/etc/xdg/autostart/mko-we
 cp -r data/wallpaper/. "$ROOT/usr/share/wallpapers/MKO-OS/"
 install -m644 data/mko-os.svg "$ROOT/usr/share/icons/hicolor/scalable/apps/"
 install -m644 data/mko-os.svg "$ROOT/usr/share/pixmaps/"
+# Paketquelle für Updates der MKO-Bausteine
+mkdir -p "$ROOT/usr/share/keyrings" "$ROOT/etc/apt/sources.list.d" "$ROOT/usr/lib/systemd/system"
+install -m644 data/apt/mko-os.gpg "$ROOT/usr/share/keyrings/mko-os.gpg"
+install -m644 data/apt/mko-os.sources "$ROOT/etc/apt/sources.list.d/mko-os.sources"
+install -m644 data/systemd/mko-npm-update.service data/systemd/mko-npm-update.timer "$ROOT/usr/lib/systemd/system/"
 install -m644 README.md "$ROOT/usr/share/doc/mko-desktop/"
 install -m644 ../LICENSE "$ROOT/usr/share/doc/mko-desktop/copyright"
 sed -e "s/@VERSION@/$VERSION/" -e "s/@MAIL@/$MAIL/" packaging/control > "$ROOT/DEBIAN/control"
-printf '/etc/xdg/autostart/mko-welcome.desktop\n/etc/xdg/autostart/mko-tastenkuerzel.desktop\n' > "$ROOT/DEBIAN/conffiles"
+printf '/etc/xdg/autostart/mko-welcome.desktop\n/etc/xdg/autostart/mko-tastenkuerzel.desktop\n/etc/apt/sources.list.d/mko-os.sources\n' > "$ROOT/DEBIAN/conffiles"
+install -m755 packaging/postinst packaging/prerm "$ROOT/DEBIAN/"
 mkdir -p dist
 dpkg-deb --root-owner-group --build "$ROOT" "dist/mko-desktop_${VERSION}_all.deb"

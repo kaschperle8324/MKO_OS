@@ -1,0 +1,10 @@
+[Unit]
+Description=Claude Code und Bitwarden-CLI aktualisieren (npm)
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=/usr/bin/npm
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/npm install -g --no-fund --no-audit @anthropic-ai/claude-code@latest @bitwarden/cli@latest
+Nice=10

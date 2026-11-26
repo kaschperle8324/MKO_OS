@@ -35,6 +35,13 @@ Die ISO enthält **keine persönlichen Daten**. Alle Zugänge (Claude-Konto, Pos
 Frigate, Vaultwarden, Home Assistant) werden nach der Installation im Willkommensfenster eingerichtet und im
 KDE-Schlüsselbund gespeichert.
 
+## Updates
+
+Installierte Systeme bekommen neue Versionen der MKO-Bausteine über die signierte Paketquelle
+`https://kaschperle8324.github.io/MKO_OS/apt` – also über Discover oder `sudo apt update && sudo apt full-upgrade`,
+genau wie Debian-Updates. Neu installieren ist nicht nötig. Der Workflow „MKO OS Paketquelle“ veröffentlicht bei
+jeder Änderung an den Paketen automatisch; ein Update kommt beim Nutzer an, sobald die Versionsnummer steigt.
+
 ## Selbst bauen
 
 Die ISO baut GitHub Actions (Workflow „MKO OS ISO“, manuell startbar oder per Tag `v*`). Lokal auf Debian 13:

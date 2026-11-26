@@ -1,0 +1,7 @@
+# MKO OS – Paketquelle für die mko-*-Bausteine (signiert, https://github.com/kaschperle8324/MKO_OS)
+Types: deb
+URIs: https://kaschperle8324.github.io/MKO_OS/apt
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: /usr/share/keyrings/mko-os.gpg

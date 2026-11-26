@@ -1,6 +1,6 @@
 # mko-desktop – Grundausstattung von MKO OS
 
-Version 0.1.2 · Lizenz GPL-3.0
+Version 0.1.3 · Lizenz GPL-3.0
 
 Metapaket für alle MKO-OS-Bausteine sowie:
 
@@ -13,6 +13,10 @@ Metapaket für alle MKO-OS-Bausteine sowie:
 - **Virenprüfung auf Abruf** (`mko-virenscan`, Dolphin: Rechtsklick → „Auf Viren prüfen“) mit ClamAV: kein
   dauerhaft laufender Scanner; Signaturen hält `clamav-freshclam` aktuell. Fundstücke wahlweise in die Quarantäne
   (`~/.local/share/mko-os/quarantaene`, schreibgeschützt) oder löschen.
+- **Updates:** Paketquelle `https://kaschperle8324.github.io/MKO_OS/apt` (signiert, Schlüssel
+  `/usr/share/keyrings/mko-os.gpg`). Neue Versionen der Bausteine kommen damit über Discover oder `sudo apt update &&
+  sudo apt full-upgrade`. Claude Code und die Bitwarden-CLI (npm) aktualisiert ein wöchentlicher Timer
+  (`mko-npm-update.timer`).
 - **Hintergrundbilder** in mehreren Auflösungen (auch 4:3) unter `/usr/share/wallpapers/MKO-OS`.
 - **Logo** `mko-os` (Symbolthema).
 
@@ -20,6 +24,7 @@ Persönliche Daten enthält das Paket nicht; alle Zugänge werden erst nach der 
 
 ## Änderungen
 
+- **0.1.3** – Paketquelle für Updates, wöchentliche npm-Aktualisierung.
 - **0.1.2** – Tastenkürzel-Übersicht bei jeder Anmeldung; Virenprüfung auf Abruf.
 - **0.1.1** – Vaultwarden im Willkommensfenster.
 - **0.1.0** – Erste Fassung.

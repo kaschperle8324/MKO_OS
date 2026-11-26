@@ -1,0 +1,10 @@
+[Unit]
+Description=Wöchentliche Aktualisierung von Claude Code und Bitwarden-CLI
+
+[Timer]
+OnCalendar=weekly
+RandomizedDelaySec=6h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

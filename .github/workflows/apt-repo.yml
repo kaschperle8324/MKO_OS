@@ -1,0 +1,118 @@
+name: MKO OS Paketquelle
+
+# Baut alle mko-*-Pakete, erzeugt daraus eine signierte APT-Quelle und veröffentlicht sie auf GitHub Pages:
+# https://kaschperle8324.github.io/MKO_OS/apt  (Suite "stable", Komponente "main")
+# Benötigte Secrets: APT_SIGNING_KEY (privater GPG-Schlüssel, ASCII), APT_SIGNING_PASSPHRASE
+
+on:
+  push:
+    branches: [main]
+    paths: ["*-desktop/**", "desktop-meta/**", ".github/workflows/apt-repo.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Werkzeuge
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 dpkg-dev apt-utils gnupg ca-certificates
+
+      - name: Pakete bauen
+        run: |
+          mkdir -p public/apt/pool/main
+          for script in */packaging/build-deb.sh; do
+            dir=$(dirname "$(dirname "$script")")
+            (cd "$dir" && rm -rf dist && sh packaging/build-deb.sh)
+            cp "$dir"/dist/*.deb public/apt/pool/main/
+          done
+          ls -l public/apt/pool/main
+
+      - name: Paketverzeichnis erzeugen
+        working-directory: public/apt
+        run: |
+          mkdir -p dists/stable/main/binary-amd64
+          apt-ftparchive packages pool/main > dists/stable/main/binary-amd64/Packages
+          gzip -9 -k -f dists/stable/main/binary-amd64/Packages
+          apt-ftparchive \
+            -o APT::FTPArchive::Release::Origin="MKO OS" \
+            -o APT::FTPArchive::Release::Label="MKO OS" \
+            -o APT::FTPArchive::Release::Suite="stable" \
+            -o APT::FTPArchive::Release::Codename="stable" \
+            -o APT::FTPArchive::Release::Architectures="amd64" \
+            -o APT::FTPArchive::Release::Components="main" \
+            -o APT::FTPArchive::Release::Description="MKO OS – Bausteine für Debian 13" \
+            release dists/stable > dists/stable/Release
+
+      - name: Signieren
+        working-directory: public/apt
+        env:
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+          APT_SIGNING_PASSPHRASE: ${{ secrets.APT_SIGNING_PASSPHRASE }}
+        run: |
+          if [ -z "$APT_SIGNING_KEY" ]; then
+            echo "::error::Secret APT_SIGNING_KEY fehlt (Settings → Secrets and variables → Actions)"; exit 1
+          fi
+          export GNUPGHOME="$(mktemp -d)"
+          printf '%s\n' "$APT_SIGNING_KEY" | gpg --batch --import
+          KEYID=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec/{print $5; exit}')
+          SIGN="gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --local-user $KEYID"
+          printf '%s' "$APT_SIGNING_PASSPHRASE" | $SIGN --clearsign -o dists/stable/InRelease dists/stable/Release
+          printf '%s' "$APT_SIGNING_PASSPHRASE" | $SIGN --armor --detach-sign -o dists/stable/Release.gpg dists/stable/Release
+          gpg --armor --export "$KEYID" > mko-os.asc
+          # Gegenprobe mit dem öffentlichen Schlüssel aus dem Repo
+          gpg --dearmor < "$GITHUB_WORKSPACE/desktop-meta/data/apt/mko-os.asc" > /tmp/repo-key.gpg
+          gpgv --keyring /tmp/repo-key.gpg dists/stable/InRelease
+          rm -rf "$GNUPGHOME"
+
+      - name: Startseite
+        run: |
+          cat > public/index.html <<'HTML'
+          <!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>MKO OS Paketquelle</title>
+          <style>body{font-family:sans-serif;max-width:46rem;margin:3rem auto;padding:0 1rem;line-height:1.5}
+          pre{background:#f2f4f7;padding:1rem;overflow:auto}</style></head><body>
+          <h1>MKO OS – Paketquelle</h1>
+          <p>Auf MKO OS ist diese Quelle bereits eingetragen; Updates kommen über Discover oder
+          <code>sudo apt update &amp;&amp; sudo apt full-upgrade</code>.</p>
+          <p>Auf einem anderen Debian 13 von Hand einrichten:</p>
+          <pre>curl -fsSL https://kaschperle8324.github.io/MKO_OS/apt/mko-os.asc | sudo gpg --dearmor -o /usr/share/keyrings/mko-os.gpg
+          sudo tee /etc/apt/sources.list.d/mko-os.sources &lt;&lt;EOF
+          Types: deb
+          URIs: https://kaschperle8324.github.io/MKO_OS/apt
+          Suites: stable
+          Components: main
+          Architectures: amd64
+          Signed-By: /usr/share/keyrings/mko-os.gpg
+          EOF
+          sudo apt update</pre>
+          <p><a href="https://github.com/kaschperle8324/MKO_OS">Quellcode und ISO</a></p>
+          </body></html>
+          HTML
+          find public -type f | sort
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
