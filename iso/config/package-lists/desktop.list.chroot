@@ -45,7 +45,12 @@ filezilla
 openssh-client
 
 # Büro und Grafik
-libreoffice
+libreoffice-writer
+libreoffice-calc
+libreoffice-impress
+libreoffice-draw
+libreoffice-math
+libreoffice-kf6
 libreoffice-l10n-de
 libreoffice-help-de
 gimp
@@ -58,7 +63,6 @@ gpg
 ca-certificates
 docker.io
 nodejs
-npm
 htop
 mpv
 

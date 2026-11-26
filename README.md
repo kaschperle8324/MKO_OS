@@ -12,11 +12,12 @@ direkt eingebaut sind – ohne extra Apps oder Browser-Tabs.
 | [mko-paperless](paperless-desktop/) | Paperless-ngx als Laufwerk in Dolphin, Suche mit Alt+Leertaste, Posteingang-Benachrichtigungen |
 | [mko-immich](immich-desktop/) | Immich-Fotos als Laufwerk „Fotos“, Fotosuche, „In Immich hochladen“ im Kontextmenü |
 | [mko-frigate](frigate-desktop/) | Frigate-Kameras als Popup und Kamerawand, Ereignis-Benachrichtigungen mit Vorschaubild |
+| [mko-vault](vault-desktop/) | Vaultwarden: Passwörter per Super+Umschalt+P oder „pw …“ in der Suche, Bitwarden-Erweiterung in Chrome |
 | [mko-dashboard](dashboard-desktop/) | Haus-Anzeige mit Home-Assistant-Werten (Heizung, PV) auf einem zweiten Bildschirm |
 | [mko-desktop](desktop-meta/) | Willkommensfenster für die Ersteinrichtung, Hintergrundbilder, Logo |
 
 Dazu auf der ISO: Google Chrome, VSCodium, LibreOffice, GIMP, FileZilla (FTP/SFTP), Remmina, OpenVPN, Docker,
-Claude Code, deutsche Sprache und gängige Firmware.
+Claude Code, Bitwarden-CLI, deutsche Sprache und gängige Firmware.
 
 ## ISO herunterladen und ausprobieren
 
@@ -28,7 +29,7 @@ Claude Code, deutsche Sprache und gängige Firmware.
    Festplatte werden erst dabei abgefragt.
 
 Die ISO enthält **keine persönlichen Daten**. Alle Zugänge (Claude-Konto, Postfächer, Paperless, Immich,
-Frigate, Home Assistant) werden nach der Installation im Willkommensfenster eingerichtet und im
+Frigate, Vaultwarden, Home Assistant) werden nach der Installation im Willkommensfenster eingerichtet und im
 KDE-Schlüsselbund gespeichert.
 
 ## Selbst bauen

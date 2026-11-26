@@ -1,0 +1,14 @@
+# Schlankeres System: Pakete, die sonst nur als Empfehlung mitkämen, ausschließen.
+# Chrome ist der Browser; Java wird nur von LibreOffice Base gebraucht (nicht installiert);
+# riesige Schriftsammlungen (Noto komplett, CJK-Extra, ungehintet) bringen für Deutsch nichts.
+Package: firefox-esr firefox-esr-l10n-* thunderbird
+Pin: release *
+Pin-Priority: -1
+
+Package: default-jre default-jre-headless openjdk-*-jre openjdk-*-jre-headless libreoffice-java-common libreoffice-base libreoffice-report-builder
+Pin: release *
+Pin-Priority: -1
+
+Package: fonts-noto fonts-noto-extra fonts-noto-unhinted fonts-noto-cjk-extra fonts-noto-ui-extra
+Pin: release *
+Pin-Priority: -1

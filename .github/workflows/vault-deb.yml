@@ -1,0 +1,34 @@
+name: mko-vault .deb
+
+on:
+  push:
+    paths: ["vault-desktop/**", ".github/workflows/vault-deb.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    steps:
+      - uses: actions/checkout@v4
+      - name: Abhängigkeiten
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends python3 python3-keyring python3-dbus-next python3-aiohttp \
+            python3-pyside6.qtcore python3-pyside6.qtgui python3-pyside6.qtwidgets python3-pyside6.qtnetwork \
+            libnotify-bin wl-clipboard dbus dpkg-dev fonts-dejavu-core
+      - name: Test gegen bw-Nachbau
+        working-directory: vault-desktop
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          dbus-run-session -- python3 tests/ui_check.py
+          dbus-run-session -- python3 tests/mcp_check.py
+          dbus-run-session -- python3 tests/dbus_check.py
+      - name: Paket bauen
+        working-directory: vault-desktop
+        run: packaging/build-deb.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mko-vault-deb
+          path: vault-desktop/dist/*.deb

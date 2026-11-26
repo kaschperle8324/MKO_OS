@@ -1,6 +1,6 @@
 # mko-desktop – Grundausstattung von MKO OS
 
-Version 0.1.0 · Lizenz GPL-3.0
+Version 0.1.1 · Lizenz GPL-3.0
 
 Metapaket für alle MKO-OS-Bausteine sowie:
 
@@ -15,4 +15,5 @@ Persönliche Daten enthält das Paket nicht; alle Zugänge werden erst nach der 
 
 ## Änderungen
 
+- **0.1.1** – Vaultwarden im Willkommensfenster.
 - **0.1.0** – Erste Fassung.

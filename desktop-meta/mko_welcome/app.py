@@ -66,6 +66,8 @@ STEPS = [
      lambda: _configured("immich.toml"), lambda: ["mko-immich", "setup", "--gui"], "mko-immich"),
     ("Frigate", "Kamerabilder, Ereignisse und Benachrichtigungen.",
      lambda: _configured("frigate.toml"), lambda: ["mko-frigate", "setup", "--gui"], "mko-frigate"),
+    ("Vaultwarden", "Passwörter mit Super+Umschalt+P und über Alt+Leertaste („pw …“), Bitwarden-Erweiterung in Chrome.",
+     lambda: _configured("vault.toml"), lambda: ["mko-vault", "setup"], "mko-vault"),
     ("Home Assistant", "Haus-Anzeige mit Heizung und PV auf dem zweiten Bildschirm.",
      lambda: _configured("dashboard.toml"), lambda: ["mko-dashboard", "setup"], "mko-dashboard"),
     ("Google-Kalender", "Termine im Uhr-Popup der Taskleiste (über KOrganizer → Google Groupware).",
@@ -157,7 +159,7 @@ def main(argv=None) -> int:
     timer.timeout.connect(refresh)
     timer.start()
 
-    keys = QLabel("<b>Tastenkürzel:</b> Super+C Claude · Alt+Leertaste Suche (auch Paperless und Fotos) · "
+    keys = QLabel("<b>Tastenkürzel:</b> Super+C Claude · Super+Umschalt+P Passwörter · Alt+Leertaste Suche (auch Paperless, Fotos, „pw …“) · "
                   "Super+Umschalt+H Haus-Anzeige")
     keys.setWordWrap(True)
     lay.addWidget(keys)

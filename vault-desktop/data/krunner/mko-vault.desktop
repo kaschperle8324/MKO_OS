@@ -1,0 +1,16 @@
+[Desktop Entry]
+Name=Passwörter (Vaultwarden)
+Comment=Passwörter mit „pw …“ suchen und kopieren
+Icon=dialog-password
+Type=Service
+X-KDE-ServiceTypes=Plasma/Runner
+X-KDE-PluginInfo-Name=mko-vault
+X-KDE-PluginInfo-Author=MKO OS
+X-KDE-PluginInfo-License=GPL-3.0
+X-KDE-PluginInfo-EnabledByDefault=true
+X-Plasma-API=DBus
+X-Plasma-DBusRunner-Service=de.mkoos.VaultRunner
+X-Plasma-DBusRunner-Path=/runner
+X-Plasma-Request-Actions-Once=true
+X-Plasma-Runner-Min-Letter-Count=5
+X-Plasma-Runner-Match-Regex=^[pP][wW]\s

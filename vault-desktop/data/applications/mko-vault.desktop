@@ -1,0 +1,22 @@
+[Desktop Entry]
+Type=Application
+Name=Passwörter (Vaultwarden)
+GenericName=Passwort-Tresor
+Comment=Passwörter aus dem eigenen Vaultwarden suchen und kopieren
+Exec=mko-vault toggle
+Icon=dialog-password
+Categories=Utility;Security;
+Keywords=Passwort;Passwörter;Kennwort;Tresor;Vaultwarden;Bitwarden;TOTP;Login;
+StartupNotify=false
+X-KDE-Shortcuts=Meta+Shift+P
+Actions=lock;setup;
+
+[Desktop Action lock]
+Name=Tresor sperren
+Exec=mko-vault lock
+Icon=object-locked
+
+[Desktop Action setup]
+Name=Vaultwarden einrichten
+Exec=mko-vault setup
+Icon=configure

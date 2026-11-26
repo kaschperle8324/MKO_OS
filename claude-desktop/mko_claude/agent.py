@@ -39,7 +39,7 @@ def describe_tool(name: str, data: dict) -> tuple[str, str]:
         return "Aufgabenliste", ""
     if name.startswith("mcp__"):
         _, server, tool = (name.split("__", 2) + ["", ""])[:3]
-        label = {"paperless": "Paperless", "mail": "E-Mail", "immich": "Fotos", "frigate": "Kameras"}.get(server, server)
+        label = {"paperless": "Paperless", "mail": "E-Mail", "immich": "Fotos", "frigate": "Kameras", "vault": "Passwörter"}.get(server, server)
         detail = ", ".join(f"{k}={v}" for k, v in data.items() if not isinstance(v, (dict, list)) or v)
         return f"{label}: {tool}", detail
     return name, json.dumps(data, ensure_ascii=False)[:200]

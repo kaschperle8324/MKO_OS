@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Passwörter (Hintergrund)
+Exec=mko-vault daemon
+Icon=dialog-password
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

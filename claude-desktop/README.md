@@ -1,6 +1,6 @@
 # mko-claude – Claude als Seitenleiste in KDE Plasma
 
-Version 0.3.0 · Teil von MKO OS · Lizenz GPL-3.0
+Version 0.3.1 · Teil von MKO OS · Lizenz GPL-3.0
 
 **Super+C** öffnet Claude als Seitenleiste am rechten Bildschirmrand, ohne ein
 Programmfenster und ohne Browser. Ein zweites Super+C, Esc oder ein Klick
@@ -38,7 +38,7 @@ arbeiten.
 ## Einrichtung
 
 ```sh
-sudo apt install ./mko-claude_0.3.0_all.deb
+sudo apt install ./mko-claude_0.3.1_all.deb
 ```
 
 Beim ersten Öffnen prüft die Seitenleiste zwei Dinge:
@@ -98,6 +98,7 @@ und fehlende Anmeldung. So lässt sich die Oberfläche ohne Konto testen.
 
 ## Änderungen
 
+- **0.3.1** – Vaultwarden-Werkzeuge (nur Namen; Passwörter nie sichtbar, Kopieren nur nach Freigabe).
 - **0.3.0** – Immich- und Frigate-Werkzeuge werden automatisch eingebunden, sobald eingerichtet.
 - **0.2.0** – E-Mail-Werkzeuge (mko-mail) werden automatisch eingebunden; lesende Mail-Werkzeuge ohne Rückfrage.
 - **0.1.0** – Erste Fassung: Seitenleiste, Freigabe-Karten, Paperless-Anbindung, Dolphin-Kontextmenü, Symbol im Systemabschnitt.

@@ -25,6 +25,7 @@ DEFAULT_ALLOWED = [
     "mcp__mail__konten", "mcp__mail__posteingang", "mcp__mail__suchen", "mcp__mail__lesen",
     "mcp__immich__suchen", "mcp__immich__filtern", "mcp__immich__alben", "mcp__immich__album_inhalt",
     "mcp__immich__foto",
+    "mcp__vault__status", "mcp__vault__suchen",
     "mcp__frigate__kameras", "mcp__frigate__ereignisse", "mcp__frigate__ereignis", "mcp__frigate__statistik",
 ]
 
@@ -89,7 +90,7 @@ def mcp_config() -> Path:
         servers["paperless"] = {"command": "mko-paperless", "args": ["mcp"]}
     if shutil.which("mko-mail") and mail_accounts():
         servers["mail"] = {"command": "mko-mail", "args": ["mcp"]}
-    for name in ("immich", "frigate"):
+    for name in ("immich", "frigate", "vault"):
         if shutil.which(f"mko-{name}") and (CONFIG_DIR / f"{name}.toml").exists():
             servers[name] = {"command": f"mko-{name}", "args": ["mcp"]}
     if EXTRA_MCP.exists():
@@ -133,4 +134,7 @@ def system_prompt() -> str:
     if (CONFIG_DIR / "frigate.toml").exists():
         lines.append("Kameras aus Frigate: Werkzeuge mcp__frigate__* (kameras, ereignisse, ereignis, schnappschuss, "
                      "statistik).")
+    if (CONFIG_DIR / "vault.toml").exists():
+        lines.append("Passwörter aus Vaultwarden: mcp__vault__* (status, suchen, passwort_kopieren, entsperren_anfordern). "
+                     "Du siehst nie Passwörter; passwort_kopieren legt sie nur in die Zwischenablage.")
     return "\n".join(lines)

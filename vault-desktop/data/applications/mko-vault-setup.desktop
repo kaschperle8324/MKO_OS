@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Vaultwarden einrichten
+GenericName=Passwort-Tresor einrichten
+Comment=Server, Konto und automatische Sperre für die Passwörter einrichten
+Exec=mko-vault setup
+Icon=dialog-password
+Categories=Settings;Security;
+Keywords=Passwort;Vaultwarden;Bitwarden;Einrichten;Anmelden;
+StartupNotify=false

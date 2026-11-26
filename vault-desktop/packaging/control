@@ -1,0 +1,26 @@
+Package: mko-vault
+Version: @VERSION@
+Section: utils
+Priority: optional
+Architecture: all
+Maintainer: Markus Kaspar-Otto <@MAIL@>
+Depends: python3 (>= 3.11), python3-pyside6.qtcore, python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, python3-dbus-next, python3-keyring, libnotify-bin, wl-clipboard, nodejs
+Recommends: konsole, kdialog, npm, libkf6config-bin, plasma-workspace
+Suggests: google-chrome-stable | chromium
+Homepage: https://github.com/kaschperle8324/MKO_OS
+Description: Passwörter aus dem eigenen Vaultwarden als Teil des KDE-Desktops
+ Verbindet den Desktop mit einem selbst betriebenen Vaultwarden-Server
+ (Bitwarden-kompatibel) über die offizielle Bitwarden-CLI (bw serve):
+  - Schloss-Symbol in der Taskleiste und Popup (Meta+Umschalt+P) zum Suchen und
+    Kopieren von Benutzername, Passwort und TOTP-Code
+  - Suche in KRunner (Alt+Leertaste) mit „pw …“
+  - Zwischenablage mit KDE-Passwort-Hinweis (kein Klipper-Verlauf) und
+    automatischem Leeren
+  - automatische Sperre nach Inaktivität, beim Sperren des Bildschirms und
+    vor dem Ruhezustand
+  - MCP-Server für den Assistenten in der Seitenleiste, der nie ein
+    Geheimnis lesen kann
+  - Bitwarden-Erweiterung für Google Chrome per Richtlinie
+ Die Bitwarden-CLI selbst ist nicht in Debian; sie wird mit
+ „sudo npm install -g @bitwarden/cli“ installiert (im MKO OS-Abbild
+ bereits enthalten). Teil von MKO OS.

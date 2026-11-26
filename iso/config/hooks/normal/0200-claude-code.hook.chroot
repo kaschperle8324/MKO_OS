@@ -1,6 +1,13 @@
 #!/bin/sh
-# Claude Code systemweit (die Anmeldung erfolgt später pro Benutzer)
+# Claude Code und Bitwarden-CLI systemweit (Anmeldungen erfolgen später pro Benutzer)
 set -e
+# npm wird nur zum Installieren gebraucht und danach wieder entfernt (samt Compiler-Werkzeugen)
+DEBIAN_FRONTEND=noninteractive apt-get install -y npm
 npm install -g @anthropic-ai/claude-code
+# Bitwarden-CLI für die Vaultwarden-Anbindung (mko-vault)
+npm install -g @bitwarden/cli
 npm cache clean --force
 command -v claude
+command -v bw
+DEBIAN_FRONTEND=noninteractive apt-get purge -y npm
+DEBIAN_FRONTEND=noninteractive apt-get autoremove --purge -y
