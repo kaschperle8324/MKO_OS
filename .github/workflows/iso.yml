@@ -46,12 +46,12 @@ jobs:
           if [ "$SIZE" -gt 2000000000 ]; then
             # GitHub-Releases erlauben max. 2 GB je Datei: in Teile zerlegen
             split -b 1900M -d -a 2 "$NAME" "$NAME.part"
-            FILES="$FILES $(ls $NAME.part*)"
+            FILES="$FILES $(ls $NAME.part* | tr '\n' ' ')"
           else
             FILES="$FILES $NAME"
           fi
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
-          echo "files=$FILES" >> "$GITHUB_OUTPUT"
+          echo "files=$(echo $FILES)" >> "$GITHUB_OUTPUT"
           ls -lh MKO-OS-*
 
       - uses: actions/upload-artifact@v4
