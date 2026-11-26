@@ -1,0 +1,30 @@
+name: Alte ISO-Builds entfernen
+
+# Behält nur den neuesten automatischen Build (Tag build-*). Versions-Releases (v*) bleiben unberührt.
+# Läuft nach jedem erfolgreichen ISO-Build und lässt sich auch von Hand starten.
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["MKO OS ISO"]
+    types: [completed]
+
+permissions:
+  contents: write
+
+jobs:
+  aufraeumen:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ältere build-*-Releases löschen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh release list --repo "$REPO" --limit 100 --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | startswith("build-"))] | sort_by(.createdAt) | reverse | .[1:] | .[].tagName' |
+          while read -r tag; do
+            echo "Lösche $tag"
+            gh release delete "$tag" --repo "$REPO" --yes --cleanup-tag
+          done
+          gh release list --repo "$REPO"
