@@ -30,8 +30,21 @@ def jpeg_bytes(text: str, color: int) -> bytes:
     from PySide6.QtCore import QBuffer, QByteArray, QIODevice
     from PySide6.QtGui import QColor, QImage
 
-    img = QImage(64, 48, QImage.Format_RGB32)
+    import os as _os
+    big = bool(_os.environ.get("MOCK_IMMICH_MORE"))
+    img = QImage(480 if big else 64, 360 if big else 48, QImage.Format_RGB32)
     img.fill(QColor.fromHsv(color % 360, 200, 220))
+    if big:   # Farbverlauf und „Sonne“, damit Vorschaubilder nach Foto aussehen
+        from PySide6.QtGui import QLinearGradient, QPainter
+        p = QPainter(img)
+        g = QLinearGradient(0, 0, 0, 360)
+        g.setColorAt(0, QColor.fromHsv(color % 360, 120, 250))
+        g.setColorAt(1, QColor.fromHsv((color + 40) % 360, 230, 120))
+        p.fillRect(img.rect(), g)
+        p.setBrush(QColor(255, 240, 200))
+        p.setPen(QColor(0, 0, 0, 0))
+        p.drawEllipse(60 + color % 300, 50 + color % 90, 70, 70)
+        p.end()
     for x in range(len(text) * 3 % 64):
         img.setPixelColor(x, 24, QColor(0, 0, 0))
     data = QByteArray()
@@ -68,6 +81,15 @@ class Store:
         # Ganz ohne Größenangabe (Dateisystem muss trotzdem vollständig lesen)
         g = self.add_asset("Scan Rezept.jpg", datetime(2026, 1, 21, 8, 0, 0), "Rezept Kuchen", None, 250,
                            size_in_search=False, size_known=False)
+        import os as _os
+        if _os.environ.get("MOCK_IMMICH_MORE"):   # mehr Beispielfotos für Bildschirmfotos
+            for i in range(36):
+                when = datetime(2026, 11 - i // 9, 24 - (i % 9) * 2, 10 + i % 8, 0, 0)
+                self.add_asset(f"IMG_{2000 + i}.jpg", when, f"Foto {i}", "Sontra" if i % 3 else "Kassel",
+                               (i * 37) % 360, favorite=i % 7 == 0, people=["Linus"] if i % 4 == 0 else None)
+            v = self.add_asset("VID_0001.mp4", datetime(2026, 11, 25, 16, 0, 0), "Video Hund", "Sontra", 300)
+            self.assets[v]["type"] = "VIDEO"
+            self.assets[v]["duration"] = "0:00:17.400000"
         self.album_assets[urlaub["id"]] = [a, b]
         self.album_assets[garten["id"]] = [c, d, e]
         self.refresh_counts()
@@ -286,6 +308,11 @@ def _filter(body: dict) -> list[dict]:
         items = [a for a in items if a["fileCreatedAt"] >= body["takenAfter"]]
     if body.get("takenBefore"):
         items = [a for a in items if a["fileCreatedAt"] < body["takenBefore"]]
+    if body.get("personIds"):
+        names = {p["name"] for p in PEOPLE if p["id"] in body["personIds"]}
+        items = [a for a in items if names & {p["name"] for p in a.get("people") or []}]
+    if body.get("type"):
+        items = [a for a in items if a["type"] == body["type"]]
     if body.get("originalFileName"):
         items = [a for a in items if body["originalFileName"].lower() in a["originalFileName"].lower()]
     return sorted_desc(items)
@@ -311,6 +338,28 @@ async def search_smart(request):
         hits.sort(key=lambda h: -h[0])
         items = [STORE.public(a, in_search=True) for _, a in hits]
     return web.json_response(paged(body, items))
+
+
+PEOPLE = [{"id": "p-erika", "name": "Erika Mustermann", "isHidden": False},
+          {"id": "p-linus", "name": "Linus", "isHidden": False}]
+
+
+async def people_list(request):
+    return web.json_response({"total": len(PEOPLE), "hidden": 0, "people": PEOPLE})
+
+
+async def person_thumbnail(request):
+    from PySide6.QtCore import QBuffer, QByteArray, QIODevice
+    from PySide6.QtGui import QColor, QImage
+
+    img = QImage(96, 96, QImage.Format_RGB32)
+    img.fill(QColor("#e8a87c") if request.match_info["id"] == "p-erika" else QColor("#85cdca"))
+    data = QByteArray()
+    buf = QBuffer(data)
+    buf.open(QIODevice.WriteOnly)
+    img.save(buf, "JPEG", 85)
+    buf.close()
+    return web.Response(body=bytes(data), content_type="image/jpeg")
 
 
 async def timeline_buckets(request):
@@ -354,6 +403,8 @@ def make_app() -> web.Application:
     r.add_post("/api/search/metadata", search_metadata)
     r.add_post("/api/search/smart", search_smart)
     r.add_get("/api/timeline/buckets", timeline_buckets)
+    r.add_get("/api/people", people_list)
+    r.add_get("/api/people/{id}/thumbnail", person_thumbnail)
     r.add_get("/api/_test/state", debug_state)
     return app
 

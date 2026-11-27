@@ -10,6 +10,20 @@ Immich-Webseite muss dafür nicht geöffnet werden.
 
 ## Funktionen
 
+### Fenster „Fotos“ und Fotos-Popup
+
+- **Startmenü → „Fotos (Immich)“** (`mko-immich ui`): Zeitachse nach Monaten (lädt beim Scrollen nach),
+  Favoriten, Videos, Personen (mit Gesichtern), Alben (mit Titelbild) und inhaltliche Suche
+  („Hund im Schnee“). Größe der Vorschaubilder per Schieberegler.
+- **Mehrfachauswahl** (Strg/Umschalt, Strg+A) mit „Zu Album …“ (neuer Name legt ein Album an), Favorit,
+  Speichern und Papierkorb – auch per Rechtsklick.
+- **Bildbetrachter** (Doppelklick): ←/→ blättern, F Favorit, I Infos (Ort, Kamera, Datei, Personen),
+  Entf Papierkorb, Enter Original öffnen bzw. Video abspielen (mpv, gestreamt), Esc zurück.
+- **Hochladen:** Fotos/Ordner ins Fenster ziehen oder „Hochladen …“ (Doppelte erkennt Immich).
+- **Taskleistensymbol** mit **Popup**: neueste Fotos, Favoriten, Alben und Schnellsuche; Klick öffnet den Betrachter.
+- `mko-immich ui popup | hochladen | daemon | quit`
+
+
 ### Immich als Laufwerk (`~/Fotos`)
 
 ```
@@ -151,6 +165,7 @@ und ab v3 (Albuminhalt nur über die Suche, Blättern über `cursor`).
 
 ## Änderungen
 
+- **0.2.0** – Fenster „Fotos“ (Zeitachse, Favoriten, Videos, Personen, Alben, Suche, Mehrfachauswahl, Bildbetrachter, Hochladen), Taskleistensymbol mit Fotos-Popup.
 - **0.1.2** – Adresse wird tolerant gelesen (z. B. „http//…“, „http:/…“, doppeltes http://).
 - **0.1.1** – Einrichtung: https auf dem unverschlüsselten Immich-Port (z. B. :2283) wird erkannt und automatisch
   auf http umgestellt; Adressen ohne http:// werden ergänzt.

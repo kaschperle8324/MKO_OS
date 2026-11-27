@@ -9,8 +9,8 @@ direkt eingebaut sind – ohne extra Apps oder Browser-Tabs.
 |---|---|
 | [mko-claude](claude-desktop/) | Claude als Seitenleiste (Super+C) mit Freigabe-Karten; Zugriff auf Dateien, Paperless, E-Mail, Fotos, Kameras |
 | [mko-mail](mail-desktop/) | E-Mail ohne Mailprogramm: beliebig viele Postfächer (Strato vorbelegt), Push-Benachrichtigungen, Posteingang-Popup |
-| [mko-paperless](paperless-desktop/) | Paperless-ngx als Laufwerk in Dolphin, Suche mit Alt+Leertaste, Posteingang-Benachrichtigungen |
-| [mko-immich](immich-desktop/) | Immich-Fotos als Laufwerk „Fotos“, Fotosuche, „In Immich hochladen“ im Kontextmenü |
+| [mko-paperless](paperless-desktop/) | Fenster „Dokumente“ mit Vorschau und Bearbeiten, Posteingang-Popup mit Zähler, Laufwerk in Dolphin, Suche mit Alt+Leertaste, Benachrichtigungen |
+| [mko-immich](immich-desktop/) | Fenster „Fotos“ (Zeitachse, Alben, Personen, Bildbetrachter), Fotos-Popup, Laufwerk „Fotos“, Fotosuche, „In Immich hochladen“ im Kontextmenü |
 | [mko-frigate](frigate-desktop/) | Frigate-Kameras als Popup und Kamerawand, Ereignis-Benachrichtigungen mit Vorschaubild |
 | [mko-vault](vault-desktop/) | Vaultwarden: Passwörter per Super+Umschalt+P oder „pw …“ in der Suche, Bitwarden-Erweiterung in Chrome |
 | [mko-dashboard](dashboard-desktop/) | Haus-Anzeige mit Home-Assistant-Werten (Heizung, PV) auf einem zweiten Bildschirm |

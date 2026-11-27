@@ -1,10 +1,19 @@
 [Desktop Entry]
 Type=Application
 Name=Fotos (Immich)
-Comment=Immich-Fotos im Dateimanager öffnen
-Exec=mko-immich browse
+GenericName=Fotosammlung
+Comment=Immich-Fotos ansehen, suchen und ordnen
+Exec=mko-immich ui
 Icon=folder-pictures
-Categories=Graphics;Photography;
-Keywords=Immich;Fotos;Bilder;Alben;
-NoDisplay=false
-X-KDE-StartupNotify=false
+Categories=Graphics;Photography;Viewer;
+Keywords=Immich;Fotos;Bilder;Alben;Videos;Galerie;
+StartupWMClass=mko-immich
+Actions=Popup;Hochladen;
+
+[Desktop Action Popup]
+Name=Neueste Fotos
+Exec=mko-immich ui popup
+
+[Desktop Action Hochladen]
+Name=Fotos hochladen …
+Exec=mko-immich ui hochladen

@@ -81,11 +81,19 @@ class Notifier:
         if doc_id is None:
             return
         loop = asyncio.get_event_loop()
-        if doc_id == 0:
-            import subprocess
-            from pathlib import Path
+        import shutil
+        import subprocess
 
-            subprocess.Popen(["xdg-open", str(Path(self.cfg.mountpoint) / "Posteingang")])
+        if doc_id == 0:
+            if shutil.which("mko-paperless"):
+                subprocess.Popen(["mko-paperless", "ui", "posteingang"], start_new_session=True)
+            else:
+                from pathlib import Path
+
+                subprocess.Popen(["xdg-open", str(Path(self.cfg.mountpoint) / "Posteingang")])
+        elif action == "default" and shutil.which("mko-paperless"):
+            # Klick auf die Meldung: im Dokumente-Fenster zeigen (Vorschau, Bearbeiten)
+            subprocess.Popen(["mko-paperless", "ui", "zeige", str(doc_id)], start_new_session=True)
         elif action in ("default", "open"):
             loop.run_in_executor(None, open_document, self.cfg, self.client, doc_id, "file")
         elif action == "web":

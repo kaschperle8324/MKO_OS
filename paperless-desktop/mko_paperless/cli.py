@@ -125,6 +125,13 @@ def cmd_setup(args) -> int:
         + ("Dienste laufen." if started else "Dienste bitte mit 'systemctl --user enable --now "
            + " ".join(SERVICES) + "' starten.")
     )
+    # Oberfläche (Taskleistensymbol) starten bzw. neu laden
+    if not args.no_services:
+        from .desktop import notify_running
+
+        if not notify_running({"command": "reload"}) and shutil.which("mko-paperless"):
+            subprocess.Popen(["mko-paperless", "ui", "daemon"], start_new_session=True,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return 0
 
 
@@ -206,6 +213,12 @@ def cmd_mcp(args) -> int:
     return 0
 
 
+def cmd_ui(args) -> int:
+    from .desktop import run
+
+    return run(args.command, args.id)
+
+
 def cmd_status(args) -> int:
     cfg = load_config()
     print(f"mko-paperless {__version__}")
@@ -261,6 +274,12 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("browse", help="Laufwerk im Dateimanager öffnen")
     p.set_defaults(func=cmd_browse)
+
+    p = sub.add_parser("ui", help="Oberfläche: Fenster, Posteingang-Popup, Taskleistensymbol")
+    p.add_argument("command", nargs="?", default="fenster",
+                   choices=["fenster", "popup", "daemon", "zeige", "posteingang", "hochladen", "quit"])
+    p.add_argument("id", nargs="?", type=int, help="Dokument-ID (bei „zeige“)")
+    p.set_defaults(func=cmd_ui)
 
     p = sub.add_parser("status", help="Zustand anzeigen")
     p.set_defaults(func=cmd_status)

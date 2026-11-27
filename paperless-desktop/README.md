@@ -9,6 +9,21 @@ nicht geöffnet werden.
 
 ## Funktionen
 
+### Fenster „Dokumente“ und Posteingang-Popup
+
+- **Startmenü → „Dokumente (Paperless)“** (`mko-paperless ui`): Seitenleiste mit Posteingang, allen Dokumenten,
+  Tags (in ihren Paperless-Farben), Korrespondenten und Dokumenttypen samt Anzahl; Raster mit Vorschaubildern,
+  Volltextsuche (Strg+F), Sortierung, Nachladen beim Scrollen.
+- **Rechts** die Vorschau (ganzes PDF zum Blättern) und alle Merkmale zum Bearbeiten: Titel, Datum,
+  Korrespondent, Dokumenttyp, Tags (neue werden nach Rückfrage angelegt), ASN. Dazu Öffnen im Standardprogramm,
+  Kopie speichern, „Erledigt“ (aus dem Posteingang nehmen), im Browser öffnen, Löschen.
+- **Hochladen:** Dateien ins Fenster ziehen oder „Hochladen …“; nach der Verarbeitung wird das neue Dokument gezeigt.
+- **Taskleistensymbol** mit Zähler für den Posteingang; Klick öffnet das **Popup** mit den neuen Dokumenten
+  (Vorschau, „Ansehen“, „Erledigt“) und einer Schnellsuche über alle Dokumente.
+- Ein Klick auf eine Benachrichtigung zeigt das Dokument im Fenster.
+- `mko-paperless ui popup | zeige ID | hochladen | daemon | quit`
+
+
 ### Paperless als Laufwerk (`~/Paperless`)
 
 ```
@@ -123,6 +138,7 @@ packaging/build-deb.sh                         # Paket nach dist/
 
 ## Änderungen
 
+- **0.3.0** – Fenster „Dokumente“ (Vorschaubilder, Seitenleiste, Volltextsuche, PDF-Ansicht, Bearbeiten, Hochladen), Taskleistensymbol mit Zähler und Posteingang-Popup; Klick auf Benachrichtigung zeigt das Dokument im Fenster.
 - **0.2.2** – Adresse wird tolerant gelesen (z. B. „http//…“, fehlendes http://).
 - **0.2.1** – Neuere Paperless-Server, die alte API-Versionen ablehnen („Invalid version in Accept header“, HTTP 406):
   passende Version wird automatisch ausgehandelt.

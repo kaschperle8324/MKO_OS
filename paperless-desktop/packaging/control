@@ -4,11 +4,15 @@ Section: utils
 Priority: optional
 Architecture: all
 Maintainer: Markus Kaspar-Otto <@MAIL@>
-Depends: python3 (>= 3.11), python3-requests, python3-pyfuse3, python3-trio, python3-dbus-next, python3-keyring, fuse3, xdg-utils
-Recommends: kdialog, dolphin, plasma-workspace
+Depends: python3 (>= 3.11), python3-requests, python3-pyfuse3, python3-trio, python3-dbus-next, python3-keyring, fuse3, xdg-utils, python3-pyside6.qtcore, python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtnetwork, qt6-image-formats-plugins
+Recommends: kdialog, dolphin, plasma-workspace, python3-pyside6.qtpdf, python3-pyside6.qtpdfwidgets, libkf6config-bin
 Homepage: https://github.com/kaschperle8324/MKO_OS
 Description: Paperless-ngx als Teil des KDE-Desktops
  Bindet ein Paperless-ngx-Dokumentenarchiv in den Desktop ein:
+  - Fenster „Dokumente“: Vorschaubilder, Posteingang, Tags,
+    Korrespondenten, Dokumenttypen, Volltextsuche, PDF-Ansicht,
+    Bearbeiten und Hochladen per Ziehen und Ablegen
+  - Taskleistensymbol mit Zähler und Posteingang-Popup
   - Laufwerk im Dateimanager (Posteingang, Korrespondenten, Dokumenttypen,
     Tags, Jahre, gespeicherte Suchen, Hochladen per Kopieren)
   - Tags bearbeiten direkt in Dolphin

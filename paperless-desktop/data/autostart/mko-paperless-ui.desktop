@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Dokumente (Paperless) – Taskleistensymbol
+Exec=mko-paperless ui daemon
+Icon=folder-documents
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

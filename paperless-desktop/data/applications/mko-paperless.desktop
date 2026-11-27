@@ -1,9 +1,19 @@
 [Desktop Entry]
 Type=Application
-Name=Paperless
-Comment=Paperless-Laufwerk öffnen
-Exec=mko-paperless browse
+Name=Dokumente (Paperless)
+GenericName=Dokumentenarchiv
+Comment=Paperless-Dokumente ansehen, suchen und bearbeiten
+Exec=mko-paperless ui
 Icon=folder-documents
-Categories=Office;
-NoDisplay=false
-X-KDE-StartupNotify=false
+Categories=Office;Viewer;
+Keywords=Paperless;Dokumente;DMS;Rechnungen;Posteingang;Archiv;
+StartupWMClass=mko-paperless
+Actions=Posteingang;Hochladen;
+
+[Desktop Action Posteingang]
+Name=Posteingang
+Exec=mko-paperless ui popup
+
+[Desktop Action Hochladen]
+Name=Dokument hochladen …
+Exec=mko-paperless ui hochladen

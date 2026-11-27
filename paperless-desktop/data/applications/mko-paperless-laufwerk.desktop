@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Paperless-Laufwerk
+Comment=Paperless-Dokumente im Dateimanager öffnen
+Exec=mko-paperless browse
+Icon=folder-documents
+Categories=Office;
+Keywords=Paperless;Dokumente;Laufwerk;Dolphin;
+X-KDE-StartupNotify=false

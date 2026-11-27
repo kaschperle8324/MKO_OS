@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Fotos (Immich) – Taskleistensymbol
+Exec=mko-immich ui daemon
+Icon=folder-pictures
+NoDisplay=true
+X-KDE-autostart-phase=2
+OnlyShowIn=KDE;

@@ -14,7 +14,72 @@ from urllib.parse import parse_qs, urlparse
 TOKEN = "testtoken"
 
 
+def png_thumb(seed: int, w: int = 300, h: int = 420) -> bytes:
+    """Vorschaubild wie eine Dokumentseite: weiß, farbiger Kopf, graue Textzeilen (ohne Bildbibliothek)."""
+    import struct
+    import zlib
+
+    head = [(52, 152, 219), (231, 76, 60), (46, 204, 113), (155, 89, 182), (241, 196, 15)][seed % 5]
+    rows = []
+    for y in range(h):
+        row = bytearray([0])
+        for x in range(w):
+            if 24 <= y < 60 and 24 <= x < w - 24:
+                px = head
+            elif y >= 90 and (y - 90) % 22 < 7 and 24 <= x < w - 24 - ((y * 7 + seed * 13) % 90):
+                px = (200, 200, 205)
+            else:
+                px = (255, 255, 255)
+            row += bytes(px)
+        rows.append(bytes(row))
+
+    def chunk(kind, data):
+        c = kind + data
+        return struct.pack(">I", len(data)) + c + struct.pack(">I", zlib.crc32(c) & 0xFFFFFFFF)
+
+    return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(b"".join(rows), 6)) + chunk(b"IEND", b""))
+
+
+_QAPP = None
+
+
+def real_pdf(text: str) -> bytes:
+    """Echtes einseitiges PDF (für die eingebettete PDF-Ansicht), erzeugt mit Qt."""
+    from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QMarginsF
+    from PySide6.QtGui import QFont, QGuiApplication, QPageLayout, QPageSize, QPainter, QPdfWriter
+
+    global _QAPP
+    if QGuiApplication.instance() is None:
+        os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+        _QAPP = QGuiApplication([])
+    data = QByteArray()
+    buf = QBuffer(data)
+    buf.open(QIODevice.WriteOnly)
+    w = QPdfWriter(buf)
+    w.setPageLayout(QPageLayout(QPageSize(QPageSize.A4), QPageLayout.Portrait, QMarginsF(20, 20, 20, 20)))
+    p = QPainter(w)
+    f = QFont("Sans")
+    f.setPointSize(20)
+    f.setBold(True)
+    p.setFont(f)
+    p.drawText(200, 600, text)
+    f.setPointSize(11)
+    f.setBold(False)
+    p.setFont(f)
+    for i in range(30):
+        p.drawText(200, 1100 + i * 260, f"Position {i + 1}: Beispieltext für die Vorschau – {text}")
+    p.end()
+    buf.close()
+    return bytes(data)
+
+
 def pdf_bytes(text: str) -> bytes:
+    if os.environ.get("MOCK_PAPERLESS_MORE"):
+        try:
+            return real_pdf(text)
+        except Exception:  # noqa: BLE001 – ohne Qt: Platzhalter
+            pass
     return (b"%PDF-1.4\n% " + text.encode() + b"\n" + b"0" * 2000 + b"\n%%EOF\n")
 
 
@@ -23,15 +88,30 @@ class Store:
         self.lock = threading.Lock()
         self.correspondents = {1: {"id": 1, "name": "Stadtwerke"}, 2: {"id": 2, "name": "Amazon"}}
         self.document_types = {1: {"id": 1, "name": "Rechnung"}, 2: {"id": 2, "name": "Lieferschein"}}
-        self.tags = {1: {"id": 1, "name": "Posteingang", "is_inbox_tag": True},
-                     2: {"id": 2, "name": "Steuer 2025", "is_inbox_tag": False},
-                     3: {"id": 3, "name": "Haus", "is_inbox_tag": False}}
+        self.tags = {1: {"id": 1, "name": "Posteingang", "is_inbox_tag": True, "color": "#da4453"},
+                     2: {"id": 2, "name": "Steuer 2025", "is_inbox_tag": False, "color": "#f39c12"},
+                     3: {"id": 3, "name": "Haus", "is_inbox_tag": False, "color": "#27ae60"}}
         self.docs = {}
         self.files = {}
         self.tasks = {}
         self.add_doc("Stromrechnung Oktober", 1, 1, [2, 3], "2025-10-31", "Strom Rechnung Kilowattstunden")
         self.add_doc("Bestellung USB-Kabel", 2, 1, [1], "2026-11-20", "USB Kabel Rechnung Amazon")
         self.add_doc("Lieferschein USB-Kabel", 2, 2, [1], "2026-11-21", "Lieferschein Paket")
+        if os.environ.get("MOCK_PAPERLESS_MORE"):   # mehr Beispieldokumente für Bildschirmfotos
+            self.correspondents[3] = {"id": 3, "name": "Finanzamt Werra-Meißner"}
+            self.correspondents[4] = {"id": 4, "name": "Kontinentale"}
+            self.document_types[3] = {"id": 3, "name": "Bescheid"}
+            self.tags[4] = {"id": 4, "name": "Versicherung", "is_inbox_tag": False, "color": "#8e44ad"}
+            for i, (t, c, ty, tg, d) in enumerate([
+                ("Einkommensteuerbescheid 2025", 3, 3, [1, 2], "2026-11-18"),
+                ("Beitragsrechnung Wohngebäude", 4, 1, [4, 3], "2026-10-02"),
+                ("Abschlag Strom November", 1, 1, [3], "2026-11-01"),
+                ("Rechnung Heizungswartung", 1, 1, [3, 2], "2026-09-14"),
+                ("Schadenmeldung Wasserschaden", 4, 3, [4, 3], "2026-08-21"),
+                ("Bestellung Kabelkanal", 2, 1, [3], "2026-07-30"),
+                ("Grundsteuerbescheid", 3, 3, [3, 2], "2026-02-10"),
+            ]):
+                self.add_doc(t, c, ty, tg, d, t)
 
     def add_doc(self, title, corr, dtype, tags, created, content, filename="scan.pdf", data=None):
         doc_id = max(self.docs, default=0) + 1
@@ -176,7 +256,12 @@ class Handler(BaseHTTPRequestHandler):
         with STORE.lock:
             m = re.fullmatch(r"/api/(correspondents|document_types|tags)/", path)
             if m:
-                items = sorted(getattr(STORE, m.group(1)).values(), key=lambda o: o["name"])
+                field = {"correspondents": "correspondent", "document_types": "document_type"}.get(m.group(1))
+                items = []
+                for o in sorted(getattr(STORE, m.group(1)).values(), key=lambda o: o["name"]):
+                    n = sum(1 for d in STORE.docs.values()
+                            if (o["id"] in d["tags"] if field is None else d[field] == o["id"]))
+                    items.append(dict(o, document_count=n))
                 return self._send(200, self._page(items, q))
             if path == "/api/documents/":
                 return self._send(200, self._page(self._filter_docs(q), q))
@@ -189,7 +274,9 @@ class Handler(BaseHTTPRequestHandler):
                 if m.group(2) == "metadata/":
                     n = len(STORE.files[doc_id])
                     return self._send(200, {"original_size": n, "archive_size": n})
-                if m.group(2) in ("download/", "thumb/"):
+                if m.group(2) == "thumb/":
+                    return self._send(200, raw=png_thumb(doc_id), ctype="image/png")
+                if m.group(2) == "download/":
                     return self._send(200, raw=STORE.files[doc_id], ctype="application/pdf")
                 return self._send(200, STORE.docs[doc_id])
         self._send(404, {"detail": "not found"})
