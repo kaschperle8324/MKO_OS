@@ -91,7 +91,9 @@ def cmd_setup(args) -> int:
     cfg = load_config()
     ui = Prompter(args.gui or not sys.stdin.isatty())
     cfg.url = ui.ask("Adresse deines Paperless (z. B. http://paperless.lan:8000)", cfg.url or "http://")
-    cfg.url = cfg.url.rstrip("/")
+    from mko_paperless.api import clean_url
+
+    cfg.url = clean_url(cfg.url).rstrip("/")
     if ui.choose_token():
         token = ui.secret("API-Token (Paperless → Profil → Auth-Token)")
     else:

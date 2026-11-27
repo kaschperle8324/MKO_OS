@@ -6,6 +6,7 @@ import argparse
 import getpass
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -100,6 +101,19 @@ def add_dolphin_place(mountpoint: str) -> bool:
     return True
 
 
+def clean_url(raw: str) -> str:
+    """Adresse tolerant lesen: fehlendes, doppeltes oder vertipptes Schema (http//, http:/, http://http://)."""
+    url = raw.strip().replace("\\", "/")
+    scheme = ""
+    while True:
+        m = re.match(r"(?i)(https?)(?::/*|/+)", url)
+        if not m:
+            break
+        scheme = scheme or m.group(1).lower()
+        url = url[m.end():]
+    return f"{scheme or 'http'}://{url.lstrip(':/')}" if url else ""
+
+
 def _looks_like_plain_http(error: str) -> bool:
     """TLS-Fehler, wie sie entstehen, wenn ein unverschlüsselter Server per https angesprochen wird."""
     error = error.lower()
@@ -112,9 +126,8 @@ def cmd_setup(args) -> int:
     ui = Prompter(args.gui or not sys.stdin.isatty())
     cfg.url = ui.ask("Adresse deines Immich (z. B. https://immich.example oder http://192.168.1.10:2283)",
                      cfg.url or "http://")
+    cfg.url = clean_url(cfg.url)
     cfg.url = cfg.base
-    if "://" not in cfg.url:
-        cfg.url = "http://" + cfg.url
     api_key = ui.secret(KEY_HINT).strip()
     try:
         try:

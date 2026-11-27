@@ -151,6 +151,7 @@ und ab v3 (Albuminhalt nur über die Suche, Blättern über `cursor`).
 
 ## Änderungen
 
+- **0.1.2** – Adresse wird tolerant gelesen (z. B. „http//…“, „http:/…“, doppeltes http://).
 - **0.1.1** – Einrichtung: https auf dem unverschlüsselten Immich-Port (z. B. :2283) wird erkannt und automatisch
   auf http umgestellt; Adressen ohne http:// werden ergänzt.
 - **0.1.0** – Erste Fassung: Laufwerk mit Alben, Zeitachse, Favoriten,

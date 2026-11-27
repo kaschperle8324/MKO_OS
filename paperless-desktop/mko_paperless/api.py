@@ -27,6 +27,19 @@ class Named:
     is_inbox_tag: bool = False
 
 
+def clean_url(raw: str) -> str:
+    """Adresse tolerant lesen: fehlendes, doppeltes oder vertipptes Schema (http//, http:/, http://http://)."""
+    url = raw.strip().replace("\\", "/")
+    scheme = ""
+    while True:
+        m = re.match(r"(?i)(https?)(?::/*|/+)", url)
+        if not m:
+            break
+        scheme = scheme or m.group(1).lower()
+        url = url[m.end():]
+    return f"{scheme or 'http'}://{url.lstrip(':/')}" if url else ""
+
+
 class PaperlessClient:
     def __init__(self, cfg: Config, token: str | None = None, timeout: float = 30.0):
         if not cfg.base:
