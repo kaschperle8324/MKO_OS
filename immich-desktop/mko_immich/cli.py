@@ -100,16 +100,33 @@ def add_dolphin_place(mountpoint: str) -> bool:
     return True
 
 
+def _looks_like_plain_http(error: str) -> bool:
+    """TLS-Fehler, wie sie entstehen, wenn ein unverschlüsselter Server per https angesprochen wird."""
+    error = error.lower()
+    return "ssl" in error and any(s in error for s in ("record layer", "wrong_version_number", "wrong version number",
+                                                        "packet length too long", "http request"))
+
+
 def cmd_setup(args) -> int:
     cfg = load_config()
     ui = Prompter(args.gui or not sys.stdin.isatty())
-    cfg.url = ui.ask("Adresse deines Immich (z. B. https://immich.example oder http://immich.example:2283)",
-                     cfg.url or "https://")
+    cfg.url = ui.ask("Adresse deines Immich (z. B. https://immich.example oder http://192.168.1.10:2283)",
+                     cfg.url or "http://")
     cfg.url = cfg.base
+    if "://" not in cfg.url:
+        cfg.url = "http://" + cfg.url
     api_key = ui.secret(KEY_HINT).strip()
     try:
-        client = ImmichClient(cfg, api_key=api_key)
-        me = client.me()
+        try:
+            client = ImmichClient(cfg, api_key=api_key)
+            me = client.me()
+        except ImmichError as exc:
+            # https auf dem reinen HTTP-Port (z. B. :2283) → TLS-Fehler; dann ohne Verschlüsselung versuchen
+            if not (cfg.url.startswith("https://") and _looks_like_plain_http(str(exc))):
+                raise
+            cfg.url = "http://" + cfg.url[len("https://"):]
+            client = ImmichClient(cfg, api_key=api_key)
+            me = client.me()
         albums = client.albums()
         version = client.server_version()
     except ImmichError as exc:
