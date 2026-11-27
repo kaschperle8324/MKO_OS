@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 import threading
@@ -48,6 +49,10 @@ class Store:
 STORE = Store()
 
 
+# Erlaubte API-Versionen, z. B. MOCK_PAPERLESS_VERSIONS=9,10 für einen neueren Server
+ALLOWED_VERSIONS = [int(v) for v in os.environ.get("MOCK_PAPERLESS_VERSIONS", "1,2,3,4,5,6,7,8,9").split(",")]
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -57,6 +62,7 @@ class Handler(BaseHTTPRequestHandler):
     def _send(self, code: int, payload=None, raw: bytes | None = None, ctype="application/json"):
         body = raw if raw is not None else json.dumps(payload).encode()
         self.send_response(code)
+        self.send_header("X-Api-Version", str(max(ALLOWED_VERSIONS)))
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -65,6 +71,11 @@ class Handler(BaseHTTPRequestHandler):
     def _auth(self) -> bool:
         if self.headers.get("Authorization") != f"Token {TOKEN}":
             self._send(401, {"detail": "unauthorized"})
+            return False
+        # wie Paperless-ngx: unbekannte API-Version im Accept-Kopf → 406
+        m = re.search(r"version=(\d+)", self.headers.get("Accept", ""))
+        if m and int(m.group(1)) not in ALLOWED_VERSIONS:
+            self._send(406, {"detail": 'Invalid version in "Accept" header.'})
             return False
         return True
 

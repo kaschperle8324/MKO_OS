@@ -123,6 +123,8 @@ packaging/build-deb.sh                         # Paket nach dist/
 
 ## Änderungen
 
+- **0.2.1** – Neuere Paperless-Server, die alte API-Versionen ablehnen („Invalid version in Accept header“, HTTP 406):
+  passende Version wird automatisch ausgehandelt.
 - **0.2.0** – MCP-Server für Claude; Laufwerk übersteht Abstürze (hängender Mount wird gelöst,
   unerwartete Fehler werden gemeldet statt das Laufwerk zu beenden).
 - **0.1.0** – Erste Fassung: Laufwerk, Tag-Bearbeitung per Dateiattribut,

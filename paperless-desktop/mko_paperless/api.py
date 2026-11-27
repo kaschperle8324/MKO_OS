@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import threading
 import time
 from dataclasses import dataclass
@@ -11,7 +12,8 @@ import requests
 
 from .config import Config, get_token
 
-API_VERSION = "5"
+API_VERSION = "5"  # bevorzugt; neuere Server lehnen alte Versionen ab → automatisch aushandeln
+_NEGOTIATED: dict[str, str] = {}  # Server-URL → zuletzt akzeptierte API-Version
 
 
 class PaperlessError(RuntimeError):
@@ -36,7 +38,7 @@ class PaperlessClient:
         self.session.verify = cfg.verify_tls
         self.session.headers.update({
             "Authorization": f"Token {token if token is not None else get_token(cfg)}",
-            "Accept": f"application/json; version={API_VERSION}",
+            "Accept": f"application/json; version={_NEGOTIATED.get(cfg.base, API_VERSION)}",
             "User-Agent": "mko-paperless",
         })
         self._lock = threading.Lock()
@@ -54,11 +56,45 @@ class PaperlessClient:
             resp = self.session.request(method, self._url(path), **kw)
         except requests.RequestException as exc:
             raise PaperlessError(f"Paperless nicht erreichbar: {exc}") from exc
+        if resp.status_code == 406 and "version" in resp.text.lower() and self._negotiate_version():
+            return self._request(method, path, **kw)
         if resp.status_code == 401 or resp.status_code == 403:
             raise PaperlessError("Zugriff verweigert – Token prüfen.")
         if resp.status_code >= 400:
             raise PaperlessError(f"{method} {path}: HTTP {resp.status_code} {resp.text[:200]}")
         return resp
+
+    def _negotiate_version(self) -> bool:
+        """Passende API-Version suchen, wenn der Server die bevorzugte ablehnt (HTTP 406).
+
+        Paperless-ngx nimmt alte API-Versionen irgendwann aus dem Programm. Die höchste Version steht im
+        Kopf X-Api-Version; gesucht wird die niedrigste akzeptierte ab der bevorzugten, damit die Felder
+        möglichst nah an dem bleiben, wofür dieser Client geschrieben ist."""
+        current = re.search(r"version=(\d+)", self.session.headers.get("Accept", ""))
+        tried = int(current.group(1)) if current else 0
+        try:
+            probe = self.session.get(f"{self.base}/api/", headers={"Accept": "application/json"},
+                                     timeout=self.timeout)
+            newest = int(probe.headers.get("X-Api-Version", "0"))
+        except (requests.RequestException, ValueError):
+            return False
+        if newest <= 0:
+            return False
+        start = int(API_VERSION)
+        candidates = list(range(start, newest + 1)) if newest >= start else list(range(newest, 0, -1))
+        for version in candidates:
+            if version == tried:
+                continue
+            try:
+                resp = self.session.get(f"{self.base}/api/tags/", params={"page_size": 1}, timeout=self.timeout,
+                                        headers={"Accept": f"application/json; version={version}"})
+            except requests.RequestException:
+                return False
+            if resp.status_code != 406:
+                _NEGOTIATED[self.base] = str(version)
+                self.session.headers["Accept"] = f"application/json; version={version}"
+                return True
+        return False
 
     def get_json(self, path: str, params: dict | None = None) -> Any:
         return self._request("GET", path, params=params).json()
