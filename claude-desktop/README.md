@@ -98,6 +98,7 @@ und fehlende Anmeldung. So lässt sich die Oberfläche ohne Konto testen.
 
 ## Änderungen
 
+- **0.4.0** – Breite einstellbar: linken Rand ziehen, Umschalter breit/schmal (auch Doppelklick auf den Rand), Strg+Plus/Minus, Strg+0 = Standard; die Breite bleibt gespeichert. Antworten brechen jetzt überall sauber um – auch lange Pfade, Adressen, Wörter und Code-Zeilen.
 - **0.3.2** – Erkennt, ob es auf MKO OS oder Kubuntu läuft, und sagt Claude das passende System.
 - **0.3.1** – Vaultwarden-Werkzeuge (nur Namen; Passwörter nie sichtbar, Kopieren nur nach Freigabe).
 - **0.3.0** – Immich- und Frigate-Werkzeuge werden automatisch eingebunden, sobald eingerichtet.

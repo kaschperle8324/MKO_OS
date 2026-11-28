@@ -61,7 +61,30 @@ def load() -> Settings:
     if os.environ.get("MKO_CLAUDE_BIN"):
         s.claude_path = os.environ["MKO_CLAUDE_BIN"]
     s.workdir = os.path.expanduser(s.workdir)
+    saved = saved_width()
+    if saved:
+        s.width = saved
     return s
+
+
+WIDTH_FILE = STATE_DIR / "breite"
+
+
+def saved_width() -> int | None:
+    """Zuletzt eingestellte Breite der Seitenleiste (gezogen, Strg+Plus/Minus oder Umschalter)."""
+    try:
+        value = int(WIDTH_FILE.read_text().strip())
+    except (OSError, ValueError):
+        return None
+    return value if 280 <= value <= 4000 else None
+
+
+def save_width(width: int) -> None:
+    try:
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        WIDTH_FILE.write_text(str(int(width)))
+    except OSError:
+        pass
 
 
 def paperless_mount() -> str | None:

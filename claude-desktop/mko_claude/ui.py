@@ -7,9 +7,11 @@ import shutil
 import subprocess
 
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, QUrl, Signal
-from PySide6.QtGui import QDesktopServices, QGuiApplication, QIcon, QKeyEvent, QPalette
+from PySide6.QtGui import (QColor, QCursor, QDesktopServices, QFontDatabase, QGuiApplication, QIcon, QKeyEvent,
+                           QPalette, QTextCursor, QTextFormat, QTextOption)
 from PySide6.QtWidgets import (QApplication, QFileDialog, QFrame, QHBoxLayout, QLabel, QPlainTextEdit,
-                               QPushButton, QScrollArea, QSizePolicy, QToolButton, QVBoxLayout, QWidget)
+                               QPushButton, QScrollArea, QSizePolicy, QTextBrowser, QTextEdit, QToolButton,
+                               QVBoxLayout, QWidget)
 
 from . import placement
 from . import settings as st
@@ -37,15 +39,138 @@ def tool_button(names: tuple[str, ...], tip: str, fallback: str) -> QToolButton:
     return b
 
 
-class MessageLabel(QLabel):
-    def __init__(self, text: str = "", markdown: bool = True):
+MIN_WIDTH = 360
+DEFAULT_WIDTH = 460
+
+
+def breakable(text: str) -> str:
+    """Unsichtbare Umbruchstellen nach / . _ - = &, damit lange Pfade und Adressen umbrechen."""
+    out = []
+    for ch in text:
+        out.append(ch)
+        if ch in "/._-=&?":
+            out.append("\u200b")
+    return "".join(out)
+
+
+class MessageLabel(QTextBrowser):
+    """Text, der immer in die Breite passt: Markdown, Links, auch lange Wörter, Pfade und Code-Zeilen
+    brechen um. Die Höhe folgt dem Inhalt (keine eigene Bildlaufleiste)."""
+
+    def __init__(self, text: str = "", markdown: bool = True, mono: bool = False):
         super().__init__()
-        self.setWordWrap(True)
-        self.setTextFormat(Qt.MarkdownText if markdown else Qt.PlainText)
-        self.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
+        self.markdown = markdown
+        self._text = ""
+        self.setFrameShape(QFrame.NoFrame)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setLineWrapMode(QTextEdit.WidgetWidth)
+        self.setWordWrapMode(QTextOption.WrapAtWordBoundaryOrAnywhere)
         self.setOpenExternalLinks(True)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.setReadOnly(True)
+        self.setTextInteractionFlags(Qt.TextSelectableByMouse | Qt.LinksAccessibleByMouse)
+        self.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.viewport().setAutoFillBackground(False)
+        self.setStyleSheet("QTextBrowser { background: transparent; }")
+        self.document().setDocumentMargin(0)
+        if mono:
+            self.setFont(QFontDatabase.systemFont(QFontDatabase.FixedFont))
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.document().documentLayout().documentSizeChanged.connect(lambda *_: self._fit())
         self.setText(text)
+
+    def setText(self, text: str):
+        self._text = text
+        if self.markdown:
+            self.setMarkdown(text)
+        else:
+            self.setPlainText(text)
+        self._wrap_code()
+        self._fit()
+
+    def text(self) -> str:
+        return self._text
+
+    def _wrap_code(self):
+        """Code-Blöcke sind sonst nicht umbrechbar; leicht hinterlegt wie in der Claude-App."""
+        base = self.palette().color(QPalette.Base)
+        shade = base.darker(106) if base.lightness() > 128 else base.lighter(135)
+        block = self.document().begin()
+        while block.isValid():
+            fmt = block.blockFormat()
+            if fmt.nonBreakableLines() or fmt.hasProperty(QTextFormat.BlockCodeFence):
+                fmt.setNonBreakableLines(False)
+                fmt.setBackground(shade)
+                QTextCursor(block).setBlockFormat(fmt)
+            block = block.next()
+
+    def _fit(self):
+        width = self.viewport().width()
+        if width <= 0:
+            return
+        self.document().setTextWidth(width)
+        h = int(self.document().size().height() + 0.99) + 2
+        if self.height() != h:
+            self.setFixedHeight(h)
+
+    def resizeEvent(self, e):
+        super().resizeEvent(e)
+        self._fit()
+
+    def sizeHint(self):
+        return QSize(200, max(self.height(), 18))
+
+    def wheelEvent(self, e):
+        e.ignore()      # Mausrad an die Seitenleiste weitergeben
+
+
+class ResizeGrip(QWidget):
+    """Schmaler Streifen am linken Rand: ziehen ändert die Breite, Doppelklick schaltet breit/schmal."""
+
+    drag = Signal(int)          # gewünschte Breitenänderung in Pixeln (+ = breiter)
+    finished = Signal()
+    toggled = Signal()
+
+    def __init__(self):
+        super().__init__()
+        self.setFixedWidth(6)
+        self.setCursor(Qt.SizeHorCursor)
+        self.setToolTip("Ziehen: Breite ändern · Doppelklick: breit/schmal")
+        self._press_x = None
+
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            # nur Fensterkoordinaten verwenden – unter Wayland gibt es keine verlässlichen Bildschirmkoordinaten
+            self._press_x = e.position().x()
+
+    def mouseMoveEvent(self, e):
+        if self._press_x is not None:
+            delta = int(self._press_x - e.position().x())
+            if delta:
+                self.drag.emit(delta)
+
+    def mouseReleaseEvent(self, e):
+        if self._press_x is not None:
+            self._press_x = None
+            self.finished.emit()
+
+    def mouseDoubleClickEvent(self, e):
+        self.toggled.emit()
+
+    def paintEvent(self, e):
+        if self.underMouse() or self._press_x is not None:
+            from PySide6.QtGui import QPainter
+
+            p = QPainter(self)
+            hl = self.palette().color(QPalette.Highlight)
+            p.fillRect(self.rect().adjusted(2, 0, -1, 0), QColor(hl.red(), hl.green(), hl.blue(), 160))
+            p.end()
+
+    def enterEvent(self, e):
+        self.update()
+
+    def leaveEvent(self, e):
+        self.update()
 
 
 class UserBubble(QFrame):
@@ -69,7 +194,7 @@ class ToolLine(QLabel):
     def set_state(self, state: str):
         mark = {"läuft": "⋯", "ok": "✓", "fehler": "✗"}[state]
         short = self.detail if len(self.detail) < 90 else self.detail[:87] + "…"
-        self.setText(f"{mark}  {self.title}" + (f"\n     {short}" if short else ""))
+        self.setText(breakable(f"{mark}  {self.title}" + (f"\n     {short}" if short else "")))
         self.setToolTip(self.detail)
 
 
@@ -84,14 +209,13 @@ class PermissionCard(QFrame):
         lay.setContentsMargins(12, 10, 12, 10)
         head = QLabel(f"<b>Claude möchte: {title}</b>")
         lay.addWidget(head)
+        head.setWordWrap(True)
         if detail:
-            d = QLabel(detail)
+            d = MessageLabel(detail, markdown=False, mono=True)
             d.setObjectName("permDetail")
-            d.setWordWrap(True)
-            d.setTextInteractionFlags(Qt.TextSelectableByMouse)
             lay.addWidget(d)
         if reason and reason not in (title, detail):
-            r = QLabel(reason)
+            r = QLabel(breakable(reason))
             r.setWordWrap(True)
             r.setObjectName("dim")
             lay.addWidget(r)
@@ -190,7 +314,17 @@ class Sidebar(QWidget):
 
     # --------------------------------------------------------------- Aufbau
     def _build(self):
-        root = QVBoxLayout(self)
+        outer = QHBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(0)
+        self.grip = ResizeGrip()
+        self.grip.drag.connect(self._drag_width)
+        self.grip.finished.connect(self._width_done)
+        self.grip.toggled.connect(self.toggle_wide)
+        outer.addWidget(self.grip)
+        body = QWidget()
+        outer.addWidget(body, 1)
+        root = QVBoxLayout(body)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
@@ -204,6 +338,10 @@ class Sidebar(QWidget):
         h.addWidget(title)
         h.addWidget(self.model_label)
         h.addStretch()
+        self.wide_btn = tool_button(("view-split-left-right", "zoom-fit-width", "transform-scale"),
+                                    "Breit/schmal umschalten (Strg+Plus/Minus: feiner; linken Rand ziehen)", "⇔")
+        self.wide_btn.clicked.connect(self.toggle_wide)
+        h.addWidget(self.wide_btn)
         new_btn = tool_button(("document-new", "list-add"), "Neues Gespräch (Strg+N)", "+")
         new_btn.clicked.connect(self.new_chat)
         self.pin_btn = tool_button(("window-pin", "pin"), "Angeheftet lassen", "📌")
@@ -258,6 +396,16 @@ class Sidebar(QWidget):
         root.addWidget(footer)
 
         self._welcome()
+
+        # Breite per Tastatur (als Kürzel, damit Eingabefeld und Texte sie nicht als Zoom abfangen)
+        from PySide6.QtGui import QKeySequence, QShortcut
+
+        for keys, step in ((("Ctrl++", "Ctrl+="), 80), (("Ctrl+-",), -80), (("Ctrl+0",), 0)):
+            for k in keys:
+                sc = QShortcut(QKeySequence(k), self)
+                sc.setContext(Qt.WindowShortcut)
+                sc.activated.connect(lambda s=step: self.set_width(self.width() + s) if s
+                                     else self.set_width(DEFAULT_WIDTH))
 
     def _style(self):
         pal = QApplication.palette()
@@ -435,6 +583,42 @@ class Sidebar(QWidget):
     # ------------------------------------------------------- Ein/Ausblenden
     def _set_pinned(self, value: bool):
         self.pinned = value
+
+    # ------------------------------------------------------------- Breite
+    def _max_width(self) -> int:
+        screen = QGuiApplication.screenAt(QCursor.pos()) or QGuiApplication.primaryScreen()
+        return max(MIN_WIDTH + 100, int(screen.availableGeometry().width() * 0.75))
+
+    def set_width(self, width: int, save: bool = True):
+        width = max(MIN_WIDTH, min(int(width), self._max_width()))
+        self.cfg.width = width
+        placement.place(self, width)
+        if save:
+            st.save_width(width)
+
+    def _drag_width(self, delta: int):
+        self._drag_target = max(MIN_WIDTH, min(self.width() + delta, self._max_width()))
+        if not QGuiApplication.platformName().startswith("wayland"):
+            self.set_width(self._drag_target, save=False)       # X11: sofort
+        elif not getattr(self, "_drag_timer", None) or not self._drag_timer.isActive():
+            # Wayland: Position und Größe setzt eine KWin-Regel – nicht öfter als nötig neu schreiben
+            self._drag_timer = QTimer(self, singleShot=True, interval=90)
+            self._drag_timer.timeout.connect(lambda: self.set_width(self._drag_target, save=False))
+            self._drag_timer.start()
+
+    def _width_done(self):
+        target = getattr(self, "_drag_target", None)
+        if target:
+            self.set_width(target)
+
+    def toggle_wide(self):
+        normal = st.saved_width() or DEFAULT_WIDTH
+        wide = max(760, int(self._max_width() * 0.6))
+        if self.width() < wide - 40:
+            self._narrow_width = self.width()
+            self.set_width(wide, save=False)
+        else:
+            self.set_width(getattr(self, "_narrow_width", None) or min(normal, wide - 100), save=False)
 
     def show_panel(self):
         placement.place(self, self.cfg.width)
